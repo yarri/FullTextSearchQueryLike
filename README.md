@@ -9,20 +9,17 @@ with this class you can boost up your application to nearly like "profi full-tex
 Basic usage
 -----------
 
-    $conditions = [];
-    // e.g. $conditions[] = "deleted=FALSE"
+Consider table articles with fields title, body and author in which we would like to let users search.
+
+    $query = "SELECT * FROM articles";
 
     $q = $_GET["search"];
 
-    $search_condition = FullTextSearchQueryLike::GetQuery("UPPER(title||' '||body||' '||author)",strtoupper($q));
+    $search_condition = FullTextSearchQueryLike::GetQuery("title||' '||body||' '||author",$q);
     if($search_condition){
-      $conditions[] = $search_condition;
+      $query . = " WHERE $search_condition";
     }
 
-    $query = "SELECT * FROM articles";
-    if($conditions){
-      $query .= " WHERE ".join(") AND (",$conditions).")";
-    }
     $query .= " ORDER BY created_at DESC";
 
 Installation
