@@ -1,5 +1,5 @@
 <?php
-class fullTextSearchQuery{
+class FullTextSearchQuery{
 	var
 		//
 		$AUTO_AVOID_ERROR = true,
