@@ -1,6 +1,8 @@
 FullTextSearchQueryLike
 =======================
 
+[![Build Status](https://travis-ci.org/yarri/FullTextSearchQueryLike.svg?branch=master)](https://travis-ci.org/atk14/Files)
+
 FullTextSearchQueryLike is a PHP class which helps build smarty LIKE conditions for SQL query according to a custom search query string.
 
 If you ever created a web application in which table rows are being selected using the SQL operator LIKE,
