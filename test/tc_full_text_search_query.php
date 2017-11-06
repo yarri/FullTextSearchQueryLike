@@ -64,6 +64,14 @@ class TcFullTextSearchQuery extends TcBase {
 			),
 		);
 		$this->_testValidParse("beer not wine",$beer_not_wine);
+
+		// Invalid queries
+
+		$ftsq = new FullTextSearchQuery();
+
+		$this->assertFalse($ftsq->parse(""));
+		$this->assertFalse($ftsq->parse("  "));
+		$this->assertFalse($ftsq->parse(null));
 	}
 
 	function _testValidParse($query,$expected_tree){
