@@ -2,8 +2,6 @@
 class TcFullTextSearchQuery extends TcBase {
 
 	function test(){
-		$ftsq = new FullTextSearchQuery();
-
 		$this->_testValidParse("beer",array(
 			array(
 				"term" => "beer",
