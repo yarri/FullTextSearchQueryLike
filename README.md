@@ -9,18 +9,16 @@ with this class you can boost up your application to nearly like "profi full-tex
 Basic usage
 -----------
 
-Consider table articles with fields title, body and author in which we would like to let users search.
+Consider table articles with a field title in which we would like to let users search.
 
-    $query = "SELECT * FROM articles";
+    $q = $_GET["search"]; // Here comes a user query string, e.g. "beer and wine"
 
-    $q = $_GET["search"];
-
-    $search_condition = FullTextSearchQueryLike::GetQuery("title||' '||body||' '||author",$q);
-    if($search_condition){
-      $query . = " WHERE $search_condition";
+    $ftsql = new FullTextSearchQueryLike("title");
+    if($ftsql->parse($q)){
+      $search_condition = "WHERE ".$ftsql->get_formatted_query(); // e.g. "WHERE title LIKE '%beer%' AND title LIKE '%wine%'"
     }
 
-    $query .= " ORDER BY created_at DESC";
+    $query = "SELECT * FROM articles $search_condition ORDER BY created_at DESC";
 
 Installation
 ------------
