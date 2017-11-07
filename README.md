@@ -43,15 +43,26 @@ Consider a table articles with a field title in which we would like to let users
 Searching in more fields
 ------------------------
 
+    $q = $_GET["search"];
+
     $ftsql = new FullTextSearchQueryLike("title||' '||body||' '||author");
+    if($ftsql->parse($q)){
+      $search_condition = "WHERE ".$ftsql->get_formatted_query();
+    }
+
+    $query = "SELECT * FROM articles $search_condition ORDER BY created_at DESC";
 
 Case insensitive searching
 --------------------------
+
+    $q = $_GET["search"];
 
     $ftsql = new FullTextSearchQueryLike("UPPER(title||' '||body||' '||author)");
     if($ftsql->parse(strtoupper($q))){
       $search_condition = "WHERE ".$ftsql->get_formatted_query();
     }
+
+    $query = "SELECT * FROM articles $search_condition ORDER BY created_at DESC";
 
 
 Installation
