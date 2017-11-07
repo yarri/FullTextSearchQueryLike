@@ -17,6 +17,15 @@ Transformation examples
 | beer not burger      | title LIKE '%beer%' AND NOT title LIKE '%burger%'                          |
 | +beer +burger -pizza | title LIKE '%beer%' AND title LIKE '%burger%' AND NOT title LIKE '%pizza%' |
 
+Some other specialities...
+
+| Query string               | SQL LIKE condition                                                                                |
+|----------------------------|---------------------------------------------------------------------------------------------------|
+| 'beer'                     | title LIKE '%beer%'                                                                               |
+| or                         |                                                                                                   |
+| ' OR ''='                  |                                                                                                   |
+| '; DROP TABLE articles; -- | title LIKE '%DROP%' AND title LIKE '%TABLE%' AND title LIKE '%articles%' AND NOT title LIKE '%-%' |
+
 Basic usage
 -----------
 
