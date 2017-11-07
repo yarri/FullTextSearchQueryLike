@@ -1,7 +1,7 @@
 {
         "name": "yarri/full-text-search-query-like",
         "type": "library",
-        "description": "FullTextSearchQueryLike is a PHP class which helps build smarty LIKE conditions for SQL query according to a custom search query string",
+        "description": "FullTextSearchQueryLike is a PHP class which transforms search strings into clever SQL conditions with the LIKE operator",
         "keywords": ["SQL", "fulltext", "full-text", "like", "LIKE operator"],
         "homepage": "https://github.com/atk14/FullTextSearchQueryLike",
         "license": ["MIT"],
