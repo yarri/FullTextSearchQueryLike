@@ -45,6 +45,10 @@ class TcFullTextSearchQuery extends TcBase {
 		$beer_and_wine[1]["char_position"] = 9;
 		$this->_testValidParse("beer and wine",$beer_and_wine);
 
+		$beer_and_wine[0]["char_position"] = 1;
+		$beer_and_wine[1]["char_position"] = 7;
+		$this->_testValidParse("+beer +wine",$beer_and_wine);
+
 		// "beer not wine"
 
 		$beer_not_wine = array(
@@ -64,6 +68,10 @@ class TcFullTextSearchQuery extends TcBase {
 			),
 		);
 		$this->_testValidParse("beer not wine",$beer_not_wine);
+
+		$beer_not_wine[0]["char_position"] = 1;
+		$beer_not_wine[1]["char_position"] = 7;
+		$this->_testValidParse("+beer -wine",$beer_not_wine);
 
 		// Invalid queries
 
