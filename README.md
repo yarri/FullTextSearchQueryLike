@@ -40,7 +40,7 @@ Case insensitive searching
 --------------------------
 
     $ftsql = new FullTextSearchQueryLike("UPPER(title||' '||body||' '||author)");
-    if($ftsql->parse(strtouppet($q))){
+    if($ftsql->parse(strtoupper($q))){
       $search_condition = "WHERE ".$ftsql->get_formatted_query();
     }
 
