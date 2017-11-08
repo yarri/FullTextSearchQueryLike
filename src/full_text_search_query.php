@@ -603,4 +603,3 @@ class FullTextSearchQuery{
 		return false;
 	}
 }
-?>
