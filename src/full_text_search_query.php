@@ -203,10 +203,10 @@ class FullTextSearchQuery{
 			if($in[$i]["type"]=="parenthesis" && sizeof($in[$i]["childs"])==0){
 				continue;
 			}
-			if($in[$i]["type"]=="phrase" && sizeof($in[$i]["term"])==""){
+			if($in[$i]["type"]=="phrase" && strlen($in[$i]["term"])==0){
 				continue;
 			}
-			if($in[$i]["type"]=="term" && sizeof($in[$i]["term"])==""){
+			if($in[$i]["type"]=="term" && strlen($in[$i]["term"])==0){
 				continue;
 			}
 			$_out[] = $in[$i];
