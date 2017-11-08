@@ -8,7 +8,7 @@ A PHP class which transforms search strings into clever SQL conditions with the 
 Transformation examples
 -----------------------
 
-| Query string         | SQL LIKE condition                                                         |
+| Query string         | SQL conditions                                                             |
 |----------------------|----------------------------------------------------------------------------|
 | beer                 | title LIKE '%beer%'                                                        |
 | beer burger          | title LIKE '%beer%' AND title LIKE '%burger%'                              |
@@ -19,7 +19,7 @@ Transformation examples
 
 Some other specialities...
 
-| Query string               | SQL LIKE condition                                                                                |
+| Query string               | SQL conditions                                                                                    |
 |----------------------------|---------------------------------------------------------------------------------------------------|
 | 'beer'                     | title LIKE '%beer%'                                                                               |
 | or                         |                                                                                                   |
