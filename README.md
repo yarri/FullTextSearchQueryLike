@@ -5,26 +5,6 @@ FullTextSearchQueryLike
 
 A PHP class which transforms search strings into clever SQL conditions with the LIKE operator
 
-Transformation examples
------------------------
-
-| Query string         | SQL conditions                                                             |
-|----------------------|----------------------------------------------------------------------------|
-| beer                 | title LIKE '%beer%'                                                        |
-| beer burger          | title LIKE '%beer%' AND title LIKE '%burger%'                              |
-| beer and burger      | title LIKE '%beer%' AND title LIKE '%burger%'                              |
-| beer or burger       | title LIKE '%beer%' OR title LIKE '%burger%'                               |
-| beer not burger      | title LIKE '%beer%' AND NOT title LIKE '%burger%'                          |
-| +beer +burger -pizza | title LIKE '%beer%' AND title LIKE '%burger%' AND NOT title LIKE '%pizza%' |
-
-Some other specialities...
-
-| Query string               | SQL conditions                                                                                    |
-|----------------------------|---------------------------------------------------------------------------------------------------|
-| 'beer'                     | title LIKE '%beer%'                                                                               |
-| or                         |                                                                                                   |
-| ' OR ''='                  |                                                                                                   |
-| '; DROP TABLE articles; -- | title LIKE '%DROP%' AND title LIKE '%TABLE%' AND title LIKE '%articles%' AND NOT title LIKE '%-%' |
 
 Basic usage
 -----------
@@ -40,6 +20,29 @@ Consider a table articles with a field title in which we would like to let users
 
     $query = "SELECT * FROM articles $search_condition ORDER BY created_at DESC";
 
+
+Transformation examples
+-----------------------
+
+| Query string         | Formatted query                                                            |
+|----------------------|----------------------------------------------------------------------------|
+| beer                 | title LIKE '%beer%'                                                        |
+| beer burger          | title LIKE '%beer%' AND title LIKE '%burger%'                              |
+| beer and burger      | title LIKE '%beer%' AND title LIKE '%burger%'                              |
+| beer or burger       | title LIKE '%beer%' OR title LIKE '%burger%'                               |
+| beer not burger      | title LIKE '%beer%' AND NOT title LIKE '%burger%'                          |
+| +beer +burger -pizza | title LIKE '%beer%' AND title LIKE '%burger%' AND NOT title LIKE '%pizza%' |
+
+Some other specialities...
+
+| Query string               | Formatted query                                                                                   |
+|----------------------------|---------------------------------------------------------------------------------------------------|
+| 'beer'                     | title LIKE '%beer%'                                                                               |
+| or                         |                                                                                                   |
+| ' OR ''='                  |                                                                                                   |
+| '; DROP TABLE articles; -- | title LIKE '%DROP%' AND title LIKE '%TABLE%' AND title LIKE '%articles%' AND NOT title LIKE '%-%' |
+
+
 Searching in more fields
 ------------------------
 
@@ -51,6 +54,7 @@ Searching in more fields
     }
 
     $query = "SELECT * FROM articles $search_condition ORDER BY created_at DESC";
+
 
 Case insensitive searching
 --------------------------
@@ -71,6 +75,7 @@ Installation
 Use the Composer to install the FullTextSearchQueryLike.
 
     composer require yarri/full-text-search-query-like dev-master
+
 
 Licence
 -------
