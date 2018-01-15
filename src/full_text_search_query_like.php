@@ -12,19 +12,22 @@
  *	$condition = FullTextSearchQueryLike::GetQuery("UPPER(name||' '||description)",$q,$bind_ar);
  */
 class FullTextSearchQueryLike extends FullTextSearchQuery{
+
 	/**
-	* Jmeno pole, ve kterem se ma vyhledavat.
-	*/
+	 * Jmeno pole, ve kterem se ma vyhledavat.
+	 */
 	var $_field_name = "";
+
 	/**
-	* Z jake strany vyhledavaneho terminu se ma pripojit like.
-	* Paklize, je nastaveno $_search_whole_words_only na true, ignoruje se.
-	*/
+	 * Z jake strany vyhledavaneho terminu se ma pripojit like.
+	 * Paklize, je nastaveno $_search_whole_words_only na true, ignoruje se.
+	 */
 	var	$_like_match = "both"; //"left","right","both", "none"
+
 	/**
-	* Cela slova.
-	* Pokud bude nastaveno na true, budou se hledat jen cela slova.
-	*/
+	 * Cela slova.
+	 * Pokud bude nastaveno na true, budou se hledat jen cela slova.
+	 */
 	var	$_search_whole_words_only = false;
 
 	function __construct($field_name = ""){
@@ -41,29 +44,36 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 			}
 		}
 	}
-		
+
 	function set_field_name($field_name){
 		settype($_field_name,"string");
 		$this->_field_name = $field_name;
 	}
+
 	function set_like_match_both(){
 		$this->_like_match = "both";
 	}
+
 	function set_like_match_left(){
 		$this->_like_match = "left";
 	}
+
 	function set_like_match_right(){
 		$this->_like_match = "right";
 	}
+
 	function set_like_match_none(){
 		$this->_like_match = "none";
 	}
+
 	function set_search_whole_words_only(){
 		$this->_search_whole_words_only = true;
 	}
+
 	function valid_term(&$slovo,$cislo_znaku,&$error_message){
 		return $this->_zpracuj_slovo($slovo,$error_message);
 	}
+
 	function valid_phrase(&$fraze,$cislo_znaku,&$error_message){
 		$out_ar = array();
 		$_ar = explode(" ",$fraze);
@@ -113,7 +123,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 				"(" =>  " ",
 				")" =>  " ",
 				"|" =>  " ",
-				"&" =>  " ",				
+				"&" =>  " ",
 				"~" =>  " ",
 				"=" =>  " ",
 				">" => " ",
@@ -152,7 +162,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 	* $bind_ar(array(":imported" => "Y", ":redaction_id" => 1));
 	*
 	*
-	* $condition = $ft->get_formatted_query_with_binds($bind_ar); 
+	* $condition = $ft->get_formatted_query_with_binds($bind_ar);
 	*/
 	function get_formatted_query_with_binds(&$bind_ar){
 		$tree = $this->get_tree();
@@ -176,7 +186,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 		$out = "";
 		for($i=0;$i<sizeof($tree);$i++){
 			$item = $tree[$i];
-			
+
 			//occurrence
 			if($i==0 && $item["occurrence"]=="NOT"){
 				$out .= " NOT ";
@@ -192,7 +202,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 					$out .= " OR ";
 				}
 			}
-		
+
 			if(!$this->_search_whole_words_only && ($item["type"]=="term" || $item["type"]=="phrase")){
 				$key = $this->_add_bind("$_left$item[term]$_right",$bind_ar);
 				$out .= "$this->_field_name LIKE $key";

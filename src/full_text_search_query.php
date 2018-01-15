@@ -1,34 +1,33 @@
 <?php
-class FullTextSearchQuery{
-	var
-		//
-		$AUTO_AVOID_ERROR = true,
-		$_error_number = 0,
-		$_error_char_position = null,
-		$_error_messages = array(
-			//byla nalezena prava zavorka, ale chybi ji leva
-			"1" => "not opened parenthesis at char %char_position%",
-			//zavorka nebyla uzavrena
-			"2" => "not closed parenthesis at char %char_position%",
-			//fraze nebyla uzvarena
-			"3" => "not closed phrase at char %char_position%"
-		),
-		$_custom_error_message = "",
-		$_TREE = array();
-		
+class FullTextSearchQuery {
+
+	var $AUTO_AVOID_ERROR = true;
+	var $_error_number = 0;
+	var $_error_char_position = null;
+	var $_error_messages = array(
+				//byla nalezena prava zavorka, ale chybi ji leva
+				"1" => "not opened parenthesis at char %char_position%",
+				//zavorka nebyla uzavrena
+				"2" => "not closed parenthesis at char %char_position%",
+				//fraze nebyla uzvarena
+				"3" => "not closed phrase at char %char_position%"
+			);
+	var $_custom_error_message = "";
+	var $_TREE = array();
+
 	function __construct(){
 
 	}
 
-	/*****************************************
-		@function parse
-
-		@param $query dotaz do fulltextu
-			napr.: "praha and ostrava"
-
-		@return true v pripade uspechu
-		@return false v pripade neuspechu
-	*****************************************/
+	/**
+	 * @function parse
+	 *
+	 * @param $query dotaz do fulltextu
+	 *	napr.: "praha and ostrava"
+	 *
+	 * @return true v pripade uspechu
+	 * @return false v pripade neuspechu
+	 */
 	function parse($query){
 		settype($query,"string");
 
@@ -92,20 +91,20 @@ class FullTextSearchQuery{
 		return $query;
 	}
 
-	/*****************************************
-		@function get_tree
-
-		@return vyparsovany strom
-	*****************************************/
+	/**
+	 * @function get_tree
+	 *
+	 * @return vyparsovany strom
+	 */
 	function get_tree(){
 		return $this->_TREE;
 	}
 
-	/*****************************************
-		@function get_last_error_message
-
-		@return textovy popis chyby
-	*****************************************/
+	/**
+	 * @function get_last_error_message
+ 	 *
+	 * @return textovy popis chyby
+	 */
 	function get_last_error_message(){
 		if(strlen($this->_custom_error_message)>0){
 			return $this->_custom_error_message;
@@ -120,47 +119,46 @@ class FullTextSearchQuery{
 		);
 	}
 
-
-	/*****************************************
-		@function valid_term
-			funkce je volana behem validace
-			stromu. redefinovat v dedicne tride.
-			zcela legitimni postup je nastavit
-			term na pradzny string a vratit true.
-
-		@param &$term: string, slovo, ktere se
-			ma zkontrolovat
-		@param $char_position: integer, poradi
-			znaku v dotazu, na kterem je slovo
-			z prvniho parametru
-		@param &$error_message: string, naplnit
-			nejakou hlaskou v pripade chyby	
-
-		@return true v pripade uspechu
-		@return false v pripade neuspechu	
-	*****************************************/
+	/**
+	 * @function valid_term
+	 *		funkce je volana behem validace
+	 *		stromu. redefinovat v dedicne tride.
+	 *		zcela legitimni postup je nastavit
+	 *		term na pradzny string a vratit true.
+	 *
+	 *	@param &$term: string, slovo, ktere se
+	 *		ma zkontrolovat
+	 *	@param $char_position: integer, poradi
+	 *		znaku v dotazu, na kterem je slovo
+	 *		z prvniho parametru
+	 *	@param &$error_message: string, naplnit
+	 *		nejakou hlaskou v pripade chyby
+	 *
+	 *	@return true v pripade uspechu
+	 *	@return false v pripade neuspechu
+	 */
 	function valid_term(&$term,$char_position,&$error_message){
 		return true;
 	}
 
-	/*****************************************
-		@function valid_phrase
-			funkce je volana behem validace
-			stromu. redefinovat v dedicne tride.
-			zcela legitimni postup je nastavit
-			term na pradzny string a vratit true.
-
-		@param &$term: string, slova oddelene
-			mezerama, ktere se ma zkontrolovat
-		@param $char_position: integer, poradi
-			znaku v dotazu, na kterem je slovo
-			z prvniho parametru
-		@param &$error_message: string, naplnit
-			nejakou hlaskou v pripade chyby	
-
-		@return true v pripade uspechu
-		@return false v pripade neuspechu	
-	*****************************************/
+	/**
+	 * @function valid_phrase
+	 *	funkce je volana behem validace
+	 *	stromu. redefinovat v dedicne tride.
+	 *	zcela legitimni postup je nastavit
+	 *	term na pradzny string a vratit true.
+	 *
+	 * @param &$term: string, slova oddelene
+	 *	mezerama, ktere se ma zkontrolovat
+	 * @param $char_position: integer, poradi
+	 *	znaku v dotazu, na kterem je slovo
+	 *	z prvniho parametru
+	 * @param &$error_message: string, naplnit
+	 *	nejakou hlaskou v pripade chyby
+	 *
+	 * @return true v pripade uspechu
+	 * @return false v pripade neuspechu
+	 */
 	function valid_phrase(&$term,$char_position,&$error_message){
 		return true;
 	}
@@ -196,6 +194,7 @@ class FullTextSearchQuery{
 		$in = $_out;
 		return true;
 	}
+
 	function _smaz_prazdne_termy(&$in){
 		$_out = array();
 		for($i=0;$i<sizeof($in);$i++){
@@ -213,6 +212,7 @@ class FullTextSearchQuery{
 		}
 		$in = $_out;
 	}
+
 	function _zpracuj($query,&$out,$offset = 0){
 		settype($out,"array");
 		settype($offset,"integer");
@@ -230,7 +230,7 @@ class FullTextSearchQuery{
 					return false;
 				}
 			}
-			
+
 			//typ term -> "ucesat vystup"
 			//pokud bude "term" po zpracovani prazdny, nic se do pole $_out neprida
 			if($out[$i]["type"]=="term"){
@@ -254,6 +254,7 @@ class FullTextSearchQuery{
 		$out = $_out;
 		return true;
 	}
+
 	function _rozdel_fraze_a_zovorky($query,&$out,$offset){
 		settype($query,"string");
 		settype($offset,"integer");
@@ -333,7 +334,7 @@ class FullTextSearchQuery{
 					$out[] = array(
 						"term" => $_item,
 						"type" => "parenthesis",
-						"char_position" => (($i + $offset) - strlen($_item)), 
+						"char_position" => (($i + $offset) - strlen($_item)),
 						"occurrence" => $_occurrence,
 						"childs" => array()
 					);
@@ -435,6 +436,7 @@ class FullTextSearchQuery{
 		);
 		return true;
 	}
+
 	function _zpracuj_term($in){
 		settype($in,"array");
 		$out = array();
@@ -463,19 +465,19 @@ class FullTextSearchQuery{
 						if(sizeof($out) == 0){ $_first_occurrence_set = true;}
 					}elseif($_item=="-" || strtoupper($_item)=="NOT"){
 						$_occurrence = "NOT";
-						if(sizeof($out) == 0){ $_first_occurrence_set = true;} 
+						if(sizeof($out) == 0){ $_first_occurrence_set = true;}
 					}elseif(strtoupper($_item)=="OR"){
 						$_occurrence = "SHOULD";
-						if(sizeof($out) == 0){ $_first_occurrence_set = true;} 
+						if(sizeof($out) == 0){ $_first_occurrence_set = true;}
 					}else{
 						if($_item[0]=="+"){
 							$_occurrence = "MUST";
 							$_item = substr($_item,1);
-							if(sizeof($out) == 0){ $_first_occurrence_set = true;} 
+							if(sizeof($out) == 0){ $_first_occurrence_set = true;}
 						}elseif($_item[0]=="-"){
 							$_occurrence = "NOT";
 							$_item = substr($_item,1);
-							if(sizeof($out) == 0){ $_first_occurrence_set = true;} 
+							if(sizeof($out) == 0){ $_first_occurrence_set = true;}
 						}
 						if(sizeof($out) == 1){ $_second_occcurence = $_occurrence;}
 						$out[] = array(
@@ -500,7 +502,7 @@ class FullTextSearchQuery{
 			}
 			$_item .= $char;
 		}
-		//--- konec cyklu	
+		//--- konec cyklu
 		if(strlen($_item)>0){
 			if($_item=="+" || strtoupper($_item)=="AND"){
 				$_occurrence = "MUST";
@@ -531,7 +533,6 @@ class FullTextSearchQuery{
 			$out[0]["occurrence"] = $_second_occcurence;
 		}
 
-
 		//setrideni termu podle occurrence
 		$_out = array();
 		$_ar = array("MUST","SHOULD","NOT");
@@ -544,6 +545,7 @@ class FullTextSearchQuery{
 		}
 		return $_out;
 	}
+
 	function _zpracuj_frazi($in){
 		settype($in,"array");
 		$query = $in["term"];
@@ -592,6 +594,7 @@ class FullTextSearchQuery{
 		$in["term"] = $output;
 		return array($in);
 	}
+
 	function _is_white_char($char){
 		settype($char,"string");
 		if(strlen($char)!=1){
