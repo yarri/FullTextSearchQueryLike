@@ -74,7 +74,7 @@ Installation
 
 Use the Composer to install the FullTextSearchQueryLike.
 
-    composer require yarri/full-text-search-query-like dev-master
+    composer require yarri/full-text-search-query-like
 
 
 Licence
