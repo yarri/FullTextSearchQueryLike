@@ -49,7 +49,7 @@ Searching in more fields
     $q = $_GET["search"];
 
     $ftsql = new FullTextSearchQueryLike("title||' '||body||' '||author");
-		// or
+    // or
     // $ftsql = new FullTextSearchQueryLike(["title","body","author"]);
     if($ftsql->parse($q)){
       $search_condition = "WHERE ".$ftsql->get_formatted_query();
@@ -83,3 +83,5 @@ Licence
 -------
 
 FullTextSearchQueryLike is free software distributed [under the terms of the MIT license](http://www.opensource.org/licenses/mit-license)
+
+[//]: # ( vim: set ts=2 et: )
