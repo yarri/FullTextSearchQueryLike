@@ -49,6 +49,8 @@ Searching in more fields
     $q = $_GET["search"];
 
     $ftsql = new FullTextSearchQueryLike("title||' '||body||' '||author");
+		// or
+    // $ftsql = new FullTextSearchQueryLike(["title","body","author"]);
     if($ftsql->parse($q)){
       $search_condition = "WHERE ".$ftsql->get_formatted_query();
     }

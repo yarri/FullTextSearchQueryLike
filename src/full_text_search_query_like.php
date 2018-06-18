@@ -30,6 +30,13 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 	 */
 	var	$_search_whole_words_only = false;
 
+	/**
+	 *
+	 *	$ft = new FullTextSearchQuery();
+	 *	$ft = new FullTextSearchQuery("title");
+	 *	$ft = new FullTextSearchQuery("title||' '||description");
+	 *	$ft = new FullTextSearchQuery(["title","description"]);
+	 */
 	function __construct($field_name = ""){
 		$this->set_field_name($field_name);
 	}
@@ -46,8 +53,14 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 	}
 
 	function set_field_name($field_name){
+		$prev_value = $this->_field_name;
+		if(is_array($field_name)){
+			// ["title","description","body"] -> "title||' '||description||' '||body"
+			$field_name = join("||' '||",$field_name);
+		}
 		settype($_field_name,"string");
 		$this->_field_name = $field_name;
+		return $prev_value;
 	}
 
 	function set_like_match_both(){
