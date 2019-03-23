@@ -1,16 +1,16 @@
 # vim:ts=2:sw=2:et
-dist: precise
+dist: trusty
 
 language: php
 
 php:
-  - 5.3
   - 5.4
   - 5.5
   - 5.6
   - 7.0
   - 7.1
   - 7.2
+  - 7.3
 
 before_script:
   - composer update --dev 
