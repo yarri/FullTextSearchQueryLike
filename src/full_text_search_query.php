@@ -536,7 +536,7 @@ class FullTextSearchQuery {
 		//setrideni termu podle occurrence
 		$_out = array();
 		$_ar = array("MUST","SHOULD","NOT");
-		while(list(,$_occurrence) = each($_ar)){
+		foreach($_ar as $_occurrence){
 			for($i=0;$i<sizeof($out);$i++){
 				if($out[$i]["occurrence"]==$_occurrence){
 					$_out[] = $out[$i];
