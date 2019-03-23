@@ -16,4 +16,4 @@ before_script:
   - composer update --dev 
 
 script:
-  - cd test && wget -q https://raw.github.com/atk14/Atk14/master/src/scripts/run_unit_tests && chmod +x run_unit_tests && ./run_unit_tests
+  - cd test && ../vendor/bin/run_unit_tests
