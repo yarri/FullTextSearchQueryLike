@@ -2,6 +2,7 @@ FullTextSearchQueryLike
 =======================
 
 [![Build Status](https://travis-ci.org/yarri/FullTextSearchQueryLike.svg?branch=master)](https://travis-ci.org/yarri/FullTextSearchQueryLike)
+[![Downloads](https://img.shields.io/packagist/dt/yarri/full-text-search-query-like.svg)](https://packagist.org/packages/yarri/full-text-search-query-like)
 
 A PHP class which transforms search strings into clever SQL conditions with the LIKE operator.
 
