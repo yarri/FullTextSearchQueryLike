@@ -1,10 +1,11 @@
 FullTextSearchQueryLike
 =======================
 
-[![Build Status](https://travis-ci.org/yarri/FullTextSearchQueryLike.svg?branch=master)](https://travis-ci.org/atk14/Files)
+[![Build Status](https://travis-ci.org/yarri/FullTextSearchQueryLike.svg?branch=master)](https://travis-ci.org/yarri/FullTextSearchQueryLike)
 
-A PHP class which transforms search strings into clever SQL conditions with the LIKE operator
+A PHP class which transforms search strings into clever SQL conditions with the LIKE operator.
 
+The FullTextSearchQueryLike is fully tested in PHP from version 5.3 to 7.4.
 
 Basic usage
 -----------
@@ -78,6 +79,13 @@ Use the Composer to install the FullTextSearchQueryLike.
 
     composer require yarri/full-text-search-query-like
 
+
+Final notice
+------------
+
+Let's be honest. The code quality is not great. The source was extracted from the very old project. But all the time it works well and reliably.
+
+I really like it and install it to every new project i'm starting. It will be my pleasure when you find it useful too.
 
 Licence
 -------
