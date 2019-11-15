@@ -79,6 +79,14 @@ Use the Composer to install the FullTextSearchQueryLike.
 
     composer require yarri/full-text-search-query-like
 
+Testing
+-------
+
+In the package directory run:
+
+    composer update --dev
+    cd test
+    ../vendor/bin/run_unit_tests
 
 Final notice
 ------------
