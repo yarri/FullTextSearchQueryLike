@@ -92,7 +92,7 @@ In the package directory run:
 Final notice
 ------------
 
-Let's be honest. The code quality is not great. The source was extracted from the very old project. But all the time it works well and reliably.
+Let's be honest. The code style is not great and all comments are in Czech language. The source was extracted from the very old project. But all the time it works well and reliably.
 
 I really like it and install it to every new project i'm starting. It will be my pleasure when you find it useful too.
 
