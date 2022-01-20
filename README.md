@@ -6,7 +6,7 @@ FullTextSearchQueryLike
 
 A PHP class which transforms search strings into clever SQL conditions with the LIKE operator.
 
-The FullTextSearchQueryLike is fully tested in PHP from version 5.3 to 7.4.
+The FullTextSearchQueryLike is fully tested in PHP from version 5.3 to 8.0.
 
 Basic usage
 -----------
