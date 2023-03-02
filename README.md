@@ -6,7 +6,7 @@ FullTextSearchQueryLike
 
 A PHP class which transforms search strings into clever SQL conditions with the LIKE operator.
 
-The FullTextSearchQueryLike is fully tested in PHP from version 5.3 to 8.0.
+The FullTextSearchQueryLike is fully tested in PHP from version 5.6 to 8.1.
 
 Basic usage
 -----------
@@ -72,6 +72,28 @@ Case insensitive searching
 
     $query = "SELECT * FROM articles $search_condition ORDER BY created_at DESC";
 
+Variable bindings
+-----------------
+
+This is quite useful e.g. for Oracle database.
+
+    $q = $_GET["search"]; // Here comes a user query string, e.g. "beer and wine"
+
+    $ftsql = new FullTextSearchQueryLike("title");
+    if($ftsql->parse($q)){
+      $bindings = [];
+      $search_condition = "WHERE ".$ftsql->get_formatted_query_with_binds($bindings); // e.g. "WHERE title LIKE :search_word_021 AND title LIKE :search_word_022"
+    }
+
+    $query = "SELECT * FROM articles $search_condition ORDER BY created_at DESC";
+    var_dump($bindings); // e.g. [":search_word_021" => "%beer%", ":search_word_022" => "%wine%"]
+
+Keywords highlighter
+--------------------
+
+Don't forget to use my other tool for highlighting search words on a HTML output page.
+
+https://packagist.org/packages/yarri/keywords-highlighter
 
 Installation
 ------------

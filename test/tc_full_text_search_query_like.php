@@ -26,4 +26,14 @@ class TcFullTextSearchQueryLike extends TcBase {
 		$prev_f = $ftsql->set_field_name("name");
 		$this->assertEquals("title",$prev_f);
 	}
+
+	function test_bindings(){
+		$ftsql = new FullTextSearchQueryLike("title");
+		$bindings = [];
+		$ftsql->parse("beer and wine");
+		$search_condition = "WHERE ".$ftsql->get_formatted_query_with_binds($bindings); // e.g. "WHERE title LIKE '%beer%' AND title LIKE '%wine%'"
+
+		$this->assertEquals("WHERE title LIKE :search_word_021 AND title LIKE :search_word_022",$search_condition);
+		$this->assertEquals(array(":search_word_021" => "%beer%", ":search_word_022" => "%wine%"),$bindings);
+	}
 }
