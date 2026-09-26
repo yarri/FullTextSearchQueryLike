@@ -27,6 +27,18 @@ class TcFullTextSearchQueryLike extends TcBase {
 		$this->assertEquals("title",$prev_f);
 	}
 
+	// settype() se drive volalo na nedefinovanou promennou $_field_name misto
+	// na parametr $field_name - nemelo to zadny efekt na skutecne pretypovani
+	function test_set_field_name_casts_to_string(){
+		$ftsql = new FullTextSearchQueryLike("title");
+
+		$ftsql->set_field_name(123);
+		$prev_f = $ftsql->set_field_name("title");
+
+		$this->assertEquals(true,is_string($prev_f));
+		$this->assertEquals("123",$prev_f);
+	}
+
 	function test_bindings(){
 		$ftsql = new FullTextSearchQueryLike("title");
 		$bindings = [];

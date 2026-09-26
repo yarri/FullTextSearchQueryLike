@@ -66,7 +66,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 			// ["title","description","body"] -> "title||' '||description||' '||body"
 			$field_name = join("||' '||",$field_name);
 		}
-		settype($_field_name,"string");
+		settype($field_name,"string");
 		$this->_field_name = $field_name;
 		return $prev_value;
 	}
