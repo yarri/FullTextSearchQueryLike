@@ -20,7 +20,8 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 
 	/**
 	 * Z jake strany vyhledavaneho terminu se ma pripojit like.
-	 * Paklize, je nastaveno $_search_whole_words_only na true, ignoruje se.
+	 * Pokud je nastaveno $_search_whole_words_only nebo
+	 * $_search_word_beginnings_only na true, ignoruje se.
 	 */
 	protected $_like_match = "both"; //"left","right","both", "none"
 
