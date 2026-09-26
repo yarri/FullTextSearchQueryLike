@@ -95,12 +95,34 @@ class TcFullTextSearchQueryLike extends TcBase {
 		$this->assertEquals(true,$this->_like_condition_matches($condition,"(cat)"));
 	}
 
+	// v tomto rezimu se drive vsechny hodnoty vkladaly rovnou do SQL jako
+	// literaly - get_formatted_query_with_binds() vratilo prazdne $bind_ar
+	function test_search_whole_words_only_with_binds(){
+		$ftsql = new FullTextSearchQueryLike("title");
+		$ftsql->set_search_whole_words_only();
+		$ftsql->parse("cat");
+		$bindings = array();
+		$condition = $ftsql->get_formatted_query_with_binds($bindings);
+
+		$this->assertEquals(49,sizeof($bindings));
+		$this->assertEquals(true,in_array("cat",array_values($bindings)));
+		$this->assertEquals(0,substr_count($condition,"'")); // v $condition uz nejsou zadne SQL literaly, jen bind placeholdery
+
+		$this->assertEquals(false,$this->_like_condition_matches(array_values($bindings),"educat, catering"));
+		$this->assertEquals(true,$this->_like_condition_matches(array_values($bindings),"the cat sat"));
+	}
+
 	// jednoducha emulace SQL LIKE (jen "%" jako divoka karta) nad vzory
-	// "title LIKE '...'" vygenerovanymi knihovnou pro jedno pole a jeden term -
-	// vyhodnoti se jako OR vsech nalezenych vzoru
+	// "title LIKE '...'" vygenerovanymi knihovnou pro jedno pole a jeden term,
+	// nebo primo nad polem bind hodnot - vyhodnoti se jako OR vsech vzoru
 	function _like_condition_matches($condition,$value){
-		preg_match_all("/title LIKE '([^']*)'/",$condition,$m);
-		foreach($m[1] as $pattern){
+		if(is_array($condition)){
+			$patterns = $condition;
+		}else{
+			preg_match_all("/title LIKE '([^']*)'/",$condition,$m);
+			$patterns = $m[1];
+		}
+		foreach($patterns as $pattern){
 			$re = "/^".str_replace("%",".*",preg_quote($pattern,"/"))."$/s";
 			if(preg_match($re,$value)){
 				return true;

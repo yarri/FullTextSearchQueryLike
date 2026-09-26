@@ -241,7 +241,8 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 				foreach($_before_boundaries as $_before){
 					foreach($_after_boundaries as $_after){
 						$_pattern = ($_before==="" ? "" : "%$_before").$item["term"].($_after==="" ? "" : "$_after%");
-						$_patterns[] = "$this->_field_name LIKE '$_pattern'";
+						$_key = $this->_add_bind($_pattern,$bind_ar);
+						$_patterns[] = "$this->_field_name LIKE $_key";
 					}
 				}
 				$out .= "(".join(" OR ",$_patterns).")";
