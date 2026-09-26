@@ -301,24 +301,7 @@ class FullTextSearchQuery {
 				$_parentheses_counter++;
 				$_item = "";
 
-				if(
-					((strtoupper($_last_word)=="AND" || strtoupper($_last_word)=="+") && strlen($_last_word_harvest)==0) ||
-					(strtoupper($_last_word_harvest)=="AND" && strtoupper($_last_word_harvest)=="+")
-				){
-					$_occurrence = "MUST";
-				}elseif(
-					((strtoupper($_last_word)=="NOT" || strtoupper($_last_word)=="-") && strlen($_last_word_harvest)==0) ||
-					(strtoupper($_last_word_harvest)=="NOT" && strtoupper($_last_word_harvest)=="-")
-				){
-					$_occurrence = "NOT";
-				}elseif(
-					((strtoupper($_last_word)=="OR") && strlen($_last_word_harvest)==0) ||
-					(strtoupper($_last_word_harvest)=="OR")
-				){
-					$_occurrence = "SHOULD";
-				}else{
-					$_occurrence = "MUST";
-				}
+				$_occurrence = $this->_urci_occurrence_z_posledniho_slova($_last_word,$_last_word_harvest);
 				continue;
 			}
 
@@ -363,25 +346,7 @@ class FullTextSearchQuery {
 				$_within_phrase = true;
 				$_item = "";
 
-				if(
-					((strtoupper($_last_word)=="AND" || strtoupper($_last_word)=="+") && strlen($_last_word_harvest)==0) ||
-					(strtoupper($_last_word_harvest)=="AND" && strtoupper($_last_word_harvest)=="+")
-				){
-					$_occurrence = "MUST";
-				}elseif(
-					((strtoupper($_last_word)=="NOT" || strtoupper($_last_word)=="-") && strlen($_last_word_harvest)==0) ||
-					(strtoupper($_last_word_harvest)=="NOT" && strtoupper($_last_word_harvest)=="-")
-				){
-					$_occurrence = "NOT";
-				}elseif(
-					((strtoupper($_last_word)=="OR") && strlen($_last_word_harvest)==0) ||
-					(strtoupper($_last_word_harvest)=="OR")
-				){
-					$_occurrence = "SHOULD";
-				}else{
-					$_occurrence = "MUST";
-				}
-
+				$_occurrence = $this->_urci_occurrence_z_posledniho_slova($_last_word,$_last_word_harvest);
 				continue;
 			}
 
@@ -442,6 +407,32 @@ class FullTextSearchQuery {
 				"childs" => array()
 		);
 		return true;
+	}
+
+	/**
+	 * Odvodi occurrence (MUST/SHOULD/NOT) noveho bloku (zavorky/fraze) podle
+	 * posledniho slova pred nim - napr. "beer and (wine or juice)" musi mit
+	 * po "and" occurrence MUST, po "not" NOT, po "or" SHOULD.
+	 */
+	protected function _urci_occurrence_z_posledniho_slova($_last_word,$_last_word_harvest){
+		if(
+			((strtoupper($_last_word)=="AND" || strtoupper($_last_word)=="+") && strlen($_last_word_harvest)==0) ||
+			(strtoupper($_last_word_harvest)=="AND" && strtoupper($_last_word_harvest)=="+")
+		){
+			return "MUST";
+		}elseif(
+			((strtoupper($_last_word)=="NOT" || strtoupper($_last_word)=="-") && strlen($_last_word_harvest)==0) ||
+			(strtoupper($_last_word_harvest)=="NOT" && strtoupper($_last_word_harvest)=="-")
+		){
+			return "NOT";
+		}elseif(
+			((strtoupper($_last_word)=="OR") && strlen($_last_word_harvest)==0) ||
+			(strtoupper($_last_word_harvest)=="OR")
+		){
+			return "SHOULD";
+		}else{
+			return "MUST";
+		}
 	}
 
 	function _zpracuj_term($in){
