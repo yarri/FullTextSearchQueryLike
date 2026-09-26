@@ -82,6 +82,69 @@ class TcFullTextSearchQuery extends TcBase {
 		$this->assertFalse($ftsq->parse(null));
 	}
 
+	// "not"/"-" bezprostredne pred zavorkou/frazi (bez mezery) drive ztratily
+	// negaci - _urci_occurrence_z_posledniho_slova() mela v podmince pro
+	// "operator bez mezery" chybne "&&" misto "||" a porovnavala tutez
+	// promennou se dvema hodnotami zaroven, takze to nikdy nesedelo a spadlo
+	// to na vychozi MUST
+	function test_negation_without_space_before_block(){
+		$not_zavorka = array(
+			array(
+				"term" => "beer",
+				"type" => "term",
+				"char_position" => 0,
+				"occurrence" => "MUST",
+				"childs" => array(),
+			),
+			array(
+				"term" => "wine or juice",
+				"type" => "parenthesis",
+				"char_position" => 9,
+				"occurrence" => "NOT",
+				"childs" => array(
+					array(
+						"term" => "wine",
+						"type" => "term",
+						"char_position" => 9,
+						"occurrence" => "SHOULD",
+						"childs" => array(),
+					),
+					array(
+						"term" => "juice",
+						"type" => "term",
+						"char_position" => 17,
+						"occurrence" => "SHOULD",
+						"childs" => array(),
+					),
+				),
+			),
+		);
+		$this->_testValidParse("beer not(wine or juice)",$not_zavorka);
+
+		// "-" je o dva znaky kratsi nez "not", char_position se tedy posune
+		$not_zavorka[1]["char_position"] = 7;
+		$not_zavorka[1]["childs"][0]["char_position"] = 7;
+		$not_zavorka[1]["childs"][1]["char_position"] = 15;
+		$this->_testValidParse("beer -(wine or juice)",$not_zavorka);
+
+		$this->_testValidParse("beer -\"dark wine\"",array(
+			array(
+				"term" => "beer",
+				"type" => "term",
+				"char_position" => 0,
+				"occurrence" => "MUST",
+				"childs" => array(),
+			),
+			array(
+				"term" => "dark wine",
+				"type" => "phrase",
+				"char_position" => 7,
+				"occurrence" => "NOT",
+				"childs" => array(),
+			),
+		));
+	}
+
 	// drive se escapovani zavorek/uvozovek posuzovalo jen podle jednoho
 	// predchoziho znaku, takze "\\(" (escapovane lomitko a za nim realna
 	// zavorka) bylo chybne vyhodnoceno jako escapovana zavorka

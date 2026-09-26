@@ -417,12 +417,12 @@ class FullTextSearchQuery {
 	protected function _urci_occurrence_z_posledniho_slova($_last_word,$_last_word_harvest){
 		if(
 			((strtoupper($_last_word)=="AND" || strtoupper($_last_word)=="+") && strlen($_last_word_harvest)==0) ||
-			(strtoupper($_last_word_harvest)=="AND" && strtoupper($_last_word_harvest)=="+")
+			(strtoupper($_last_word_harvest)=="AND" || strtoupper($_last_word_harvest)=="+")
 		){
 			return "MUST";
 		}elseif(
 			((strtoupper($_last_word)=="NOT" || strtoupper($_last_word)=="-") && strlen($_last_word_harvest)==0) ||
-			(strtoupper($_last_word_harvest)=="NOT" && strtoupper($_last_word_harvest)=="-")
+			(strtoupper($_last_word_harvest)=="NOT" || strtoupper($_last_word_harvest)=="-")
 		){
 			return "NOT";
 		}elseif(
