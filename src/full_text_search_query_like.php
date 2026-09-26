@@ -109,11 +109,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 			if($slovo==""){
 				continue;
 			}
-			$_stat = $this->_zpracuj_slovo($slovo,$error_message);
-			if(!$_stat){
-				$fraze = "";
-				return false;
-			}
+			$this->_zpracuj_slovo($slovo,$error_message);
 			if($slovo!=""){
 				$out_ar[] = $slovo;
 			}
