@@ -117,12 +117,19 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 
 	function _zpracuj_slovo(&$slovo,&$error_message){
 
-		$slovo = $this->_removeDangerousSymbols($slovo);
+		$slovo = $this->_removeDangerousSymbolsFromWord($slovo);
 
 		return true;
 	}
 
-  protected function _removeDangerousSymbols($slovo){
+	/**
+	 * Cisti jednotlive slovo/frazi az PO tokenizaci (rozdeleni na termy/fraze/zavorky).
+	 * Nesmi se jmenovat _removeDangerousSymbols() a prekryvat tak stejnojmennou
+	 * metodu z rodicovske tridy - ta se vola na cely surovy dotaz JESTE PRED
+	 * tokenizaci, takze by tim doslo ke smazani "(", ")", '"' a "+" drive, nez
+	 * je tokenizer stihne rozpoznat jako syntaxi (zavorky/fraze/operatory).
+	 */
+	protected function _removeDangerousSymbolsFromWord($slovo){
 		$slovo = strtr($slovo,
 			array(
 				"{" =>  " ",
@@ -257,7 +264,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 			}
 
 			if($item["type"] == "parenthesis"){
-				$out .= " ".'('.$this->_get_formatted_query($item["childs"]).')';
+				$out .= '('.$this->_get_formatted_query($item["childs"],$bind_ar).')';
 			}
 		}
 		return trim($out);
