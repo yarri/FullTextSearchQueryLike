@@ -449,7 +449,7 @@ class FullTextSearchQuery {
 		$_occurrence = "MUST";
 		$prev_char = "";
 		$_first_occurrence_set = false;
-		$_second_occcurence = null;
+		$_second_occurrence = null;
 		for($i=0;$i<strlen($query);$i++){
 			$char = $query[$i];
 			if($i>0){
@@ -477,7 +477,7 @@ class FullTextSearchQuery {
 							$_item = substr($_item,1);
 							if(sizeof($out) == 0){ $_first_occurrence_set = true;}
 						}
-						if(sizeof($out) == 1){ $_second_occcurence = $_occurrence;}
+						if(sizeof($out) == 1){ $_second_occurrence = $_occurrence;}
 						$out[] = array(
 							"term" => $_item,
 							"type" => "term",
@@ -516,7 +516,7 @@ class FullTextSearchQuery {
 					$_occurrence = "NOT";
 					$_item = substr($_item,1);
 				}
-				if(sizeof($out) == 1){ $_second_occcurence = $_occurrence;}
+				if(sizeof($out) == 1){ $_second_occurrence = $_occurrence;}
 				$out[] = array(
 					"term" => $_item,
 					"type" => "term",
@@ -527,8 +527,8 @@ class FullTextSearchQuery {
 			}
 		}
 
-		if(sizeof($out)>=1 && $_first_occurrence_set==false && $_second_occcurence=="SHOULD"){
-			$out[0]["occurrence"] = $_second_occcurence;
+		if(sizeof($out)>=1 && $_first_occurrence_set==false && $_second_occurrence=="SHOULD"){
+			$out[0]["occurrence"] = $_second_occurrence;
 		}
 
 		//setrideni termu podle occurrence
