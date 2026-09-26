@@ -232,36 +232,8 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 			}
 
 			if($item["type"]=="term" || $item["type"]=="phrase"){
-				if($this->_search_whole_words_only){
-					/* Vyhledavani celych slov jenom pomoci LIKE je docela nemozne. Nasledujici reseni to jaksi resi. */
-					/* Muze se stat, ze bude nalezeno neco, co nalezeneno byt nemelo */
-					/* Hranice PRED a ZA slovem musi platit soucasne pro TENTYZ vyskyt v retezci -
-					 * proto se testuji vsechny kombinace v jednom LIKE vzoru najednou, ne dve na
-					 * sobe nezavisle OR'ovane skupiny spojene pres AND (to by dovolilo, aby "pred"
-					 * vyhovel jinemu vyskytu podretezce v poli nez "za", a vyrobilo tak false-positive
-					 * napr. pro "cat" v "educat, catering"). */
-					$_before_boundaries = array("", " ", ".", ",", "/", "(", "-");
-					$_after_boundaries = array("", " ", ".", ",", "/", ")", "-");
-					$_patterns = array();
-					foreach($_before_boundaries as $_before){
-						foreach($_after_boundaries as $_after){
-							$_pattern = ($_before==="" ? "" : "%$_before").$item["term"].($_after==="" ? "" : "$_after%");
-							$_key = $this->_add_bind($_pattern,$bind_ar);
-							$_patterns[] = "$this->_field_name LIKE $_key";
-						}
-					}
-					$out .= "(".join(" OR ",$_patterns).")";
-				}elseif($this->_search_word_beginnings_only){
-					/* Term nemusi byt cele slovo, staci aby zacinal nejakym slovem v poli -
-					 * proto se overuje jen hranice PRED termem, za nim uz muze nasledovat cokoli. */
-					$_before_boundaries = array("", " ", ".", ",", "/", "(", "-");
-					$_patterns = array();
-					foreach($_before_boundaries as $_before){
-						$_pattern = ($_before==="" ? "" : "%$_before").$item["term"]."%";
-						$_key = $this->_add_bind($_pattern,$bind_ar);
-						$_patterns[] = "$this->_field_name LIKE $_key";
-					}
-					$out .= "(".join(" OR ",$_patterns).")";
+				if($this->_search_whole_words_only || $this->_search_word_beginnings_only){
+					$out .= $this->_get_boundary_anchored_condition($item["term"],$this->_search_whole_words_only,$bind_ar);
 				}else{
 					$key = $this->_add_bind("$_left$item[term]$_right",$bind_ar);
 					$out .= "$this->_field_name LIKE $key";
@@ -273,6 +245,48 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 			}
 		}
 		return trim($out);
+	}
+
+	/**
+	 * Vyhledavani celych slov (ci jen zacatku slov) jenom pomoci LIKE je docela
+	 * nemozne. Nasledujici reseni to jaksi resi - muze se stat, ze bude
+	 * nalezeno neco, co nalezeno byt nemelo.
+	 *
+	 * $_check_after_boundary==true (set_search_whole_words_only()):
+	 *   term musi byt cele slovo - hranice PRED a ZA nim musi platit
+	 *   soucasne pro TENTYZ vyskyt v retezci, proto se testuji vsechny
+	 *   kombinace v jednom LIKE vzoru najednou, ne dve na sobe nezavisle
+	 *   OR'ovane skupiny spojene pres AND (to by dovolilo, aby "pred" vyhovel
+	 *   jinemu vyskytu podretezce v poli nez "za", a vyrobilo tak
+	 *   false-positive napr. pro "cat" v "educat, catering").
+	 *
+	 * $_check_after_boundary==false (set_search_word_beginnings_only()):
+	 *   term nemusi byt cele slovo, staci aby zacinal nejakym slovem v poli -
+	 *   proto se overuje jen hranice PRED termem, za nim uz muze nasledovat
+	 *   cokoli.
+	 */
+	protected function _get_boundary_anchored_condition($term,$_check_after_boundary,&$bind_ar){
+		$_before_boundaries = array("", " ", ".", ",", "/", "(", "-");
+		$_patterns = array();
+
+		if($_check_after_boundary){
+			$_after_boundaries = array("", " ", ".", ",", "/", ")", "-");
+			foreach($_before_boundaries as $_before){
+				foreach($_after_boundaries as $_after){
+					$_pattern = ($_before==="" ? "" : "%$_before").$term.($_after==="" ? "" : "$_after%");
+					$_key = $this->_add_bind($_pattern,$bind_ar);
+					$_patterns[] = "$this->_field_name LIKE $_key";
+				}
+			}
+		}else{
+			foreach($_before_boundaries as $_before){
+				$_pattern = ($_before==="" ? "" : "%$_before").$term."%";
+				$_key = $this->_add_bind($_pattern,$bind_ar);
+				$_patterns[] = "$this->_field_name LIKE $_key";
+			}
+		}
+
+		return "(".join(" OR ",$_patterns).")";
 	}
 
 	function _add_bind($word,&$bind_ar){
