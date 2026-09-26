@@ -77,4 +77,35 @@ class TcFullTextSearchQueryLike extends TcBase {
 			$search_condition
 		);
 	}
+
+	// hranice PRED a ZA slovem se drive overovaly ve dvou na sobe nezavislych
+	// OR skupinach spojenych pres AND - stacilo, aby "pred" vyhovel jinemu
+	// vyskytu podretezce v poli nez "za", a vzniknul false-positive
+	// (napr. "cat" v "educat, catering", i kdyz tam cele slovo "cat" neni)
+	function test_search_whole_words_only(){
+		$ftsql = new FullTextSearchQueryLike("title");
+		$ftsql->set_search_whole_words_only();
+		$this->assertEquals(true,$ftsql->parse("cat"));
+		$condition = $ftsql->get_formatted_query();
+
+		$this->assertEquals(false,$this->_like_condition_matches($condition,"educat, catering"));
+		$this->assertEquals(false,$this->_like_condition_matches($condition,"concatenate"));
+		$this->assertEquals(true,$this->_like_condition_matches($condition,"cat"));
+		$this->assertEquals(true,$this->_like_condition_matches($condition,"the cat sat"));
+		$this->assertEquals(true,$this->_like_condition_matches($condition,"(cat)"));
+	}
+
+	// jednoducha emulace SQL LIKE (jen "%" jako divoka karta) nad vzory
+	// "title LIKE '...'" vygenerovanymi knihovnou pro jedno pole a jeden term -
+	// vyhodnoti se jako OR vsech nalezenych vzoru
+	function _like_condition_matches($condition,$value){
+		preg_match_all("/title LIKE '([^']*)'/",$condition,$m);
+		foreach($m[1] as $pattern){
+			$re = "/^".str_replace("%",".*",preg_quote($pattern,"/"))."$/s";
+			if(preg_match($re,$value)){
+				return true;
+			}
+		}
+		return false;
+	}
 }

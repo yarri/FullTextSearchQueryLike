@@ -230,37 +230,21 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 			/* Vyhledavani celych slov jenom pomoci LIKE je docela nemozne. Nasledujici reseni to jaksi resi. */
 			/* Muze se stat, ze bude nalezeno neco, co nalezeneno byt nemelo */
 			if($this->_search_whole_words_only && ($item["type"]=="term" || $item["type"]=="phrase")){
-				$out .= "(";
-					$out .= "(";
-						$out .= "$this->_field_name LIKE '%$item[term]'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '%$item[term] %'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '%$item[term].%'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '%$item[term],%'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '%$item[term]/%'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '%$item[term])%'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '%$item[term]-%'";
-					$out .= ") AND (";
-						$out .= "$this->_field_name LIKE '$item[term]%'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '% $item[term]%'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '%.$item[term]%'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '%,$item[term]%'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '%/$item[term]%'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '%($item[term]%'";
-						$out .= " OR ";
-						$out .= "$this->_field_name LIKE '%-$item[term]%'";
-					$out .= ")";
-				$out .= ")";
+				/* Hranice PRED a ZA slovem musi platit soucasne pro TENTYZ vyskyt v retezci -
+				 * proto se testuji vsechny kombinace v jednom LIKE vzoru najednou, ne dve na
+				 * sobe nezavisle OR'ovane skupiny spojene pres AND (to by dovolilo, aby "pred"
+				 * vyhovel jinemu vyskytu podretezce v poli nez "za", a vyrobilo tak false-positive
+				 * napr. pro "cat" v "educat, catering"). */
+				$_before_boundaries = array("", " ", ".", ",", "/", "(", "-");
+				$_after_boundaries = array("", " ", ".", ",", "/", ")", "-");
+				$_patterns = array();
+				foreach($_before_boundaries as $_before){
+					foreach($_after_boundaries as $_after){
+						$_pattern = ($_before==="" ? "" : "%$_before").$item["term"].($_after==="" ? "" : "$_after%");
+						$_patterns[] = "$this->_field_name LIKE '$_pattern'";
+					}
+				}
+				$out .= "(".join(" OR ",$_patterns).")";
 			}
 
 			if($item["type"] == "parenthesis"){
