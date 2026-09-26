@@ -124,7 +124,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 	}
 
 	function valid_phrase(&$fraze,$cislo_znaku,&$error_message){
-		$out_ar = array();
+		$out_ar = [];
 		$_ar = explode(" ",$fraze);
 		for($i=0;$i<sizeof($_ar);$i++){
 			$slovo = $_ar[$i];
@@ -163,7 +163,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 	 */
 	protected function _removeDangerousSymbolsFromWord($slovo){
 		$slovo = strtr($slovo,
-			array(
+			[
 				"{" =>  " ",
 				"}" =>  " ",
 				"%" =>  " ",
@@ -194,7 +194,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 				//"accum" =>  "",
 				"'" => " ",
 				'"' => " "
-			)
+			]
 		);
     $slovo = trim($slovo);
 		return $slovo;
@@ -202,15 +202,14 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 
 	function get_formatted_query(){
 		$tree = $this->get_tree();
-		$bind_ar = array();
+		$bind_ar = [];
 		$out = $this->_get_formatted_query($tree,$bind_ar);
 		foreach($bind_ar as $key => &$value){ $value = "'$value'"; }
 		return strtr($out,$bind_ar);
 	}
 
 	/**
-	* $bind_ar(array(":imported" => "Y", ":redaction_id" => 1));
-	*
+	* $bind_ar([":imported" => "Y", ":redaction_id" => 1]);
 	*
 	* $condition = $ft->get_formatted_query_with_binds($bind_ar);
 	*/
@@ -288,11 +287,11 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 	 *   cokoli.
 	 */
 	protected function _get_boundary_anchored_condition($term,$_check_after_boundary,&$bind_ar){
-		$_before_boundaries = array("", " ", ".", ",", "/", "(", "-");
-		$_patterns = array();
+		$_before_boundaries = ["", " ", ".", ",", "/", "(", "-"];
+		$_patterns = [];
 
 		if($_check_after_boundary){
-			$_after_boundaries = array("", " ", ".", ",", "/", ")", "-");
+			$_after_boundaries = ["", " ", ".", ",", "/", ")", "-"];
 			foreach($_before_boundaries as $_before){
 				foreach($_after_boundaries as $_after){
 					$_pattern = ($_before==="" ? "" : "%$_before").$term.($_after==="" ? "" : "$_after%");

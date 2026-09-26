@@ -4,16 +4,16 @@ class FullTextSearchQuery {
 	protected $AUTO_AVOID_ERROR = true;
 	protected $_error_number = 0;
 	protected $_error_char_position = null;
-	protected $_error_messages = array(
+	protected $_error_messages = [
 				//byla nalezena prava zavorka, ale chybi ji leva
 				"1" => "not opened parenthesis at char %char_position%",
 				//zavorka nebyla uzavrena
 				"2" => "not closed parenthesis at char %char_position%",
 				//fraze nebyla uzvarena
 				"3" => "not closed phrase at char %char_position%"
-			);
+			];
 	protected $_custom_error_message = "";
-	protected $_TREE = array();
+	protected $_TREE = [];
 
 	function __construct(){
 
@@ -39,10 +39,10 @@ class FullTextSearchQuery {
 		$this->_error_number = 0;
 		$this->_error_char_position = null;
 		$this->_custom_error_message = "";
-		$this->_TREE = array();
+		$this->_TREE = [];
 
 		//zpracovani dotazu
-		$out = array();
+		$out = [];
 		$_stat = $this->_zpracuj($query,$out);
 		if(!$_stat){
 			return $this->_zkusit_parse_bez_zavorek_a_uvozovek($query);
@@ -80,11 +80,11 @@ class FullTextSearchQuery {
 			return false;
 		}
 		$query = strtr($query,
-			array(
+			[
 				"(" => " ",
 				")" => " ",
 				'"' => " "
-			)
+			]
 		);
 		return $this->parse($query);
 	}
@@ -115,9 +115,9 @@ class FullTextSearchQuery {
 			return "";
 		}
 		return strtr($this->_error_messages["$this->_error_number"],
-			array(
+			[
 				"%char_position%" => ($this->_error_char_position+1)
-			)
+			]
 		);
 	}
 
@@ -165,7 +165,7 @@ class FullTextSearchQuery {
 		return true;
 	}
 	function _validuj_TREE(&$in){
-		$_out = array();
+		$_out = [];
 		for($i=0;$i<sizeof($in);$i++){
 			$this->_validuj_TREE($in[$i]["childs"]);
 			if($in[$i]["type"]=="term"){
@@ -198,7 +198,7 @@ class FullTextSearchQuery {
 	}
 
 	function _smaz_prazdne_termy(&$in){
-		$_out = array();
+		$_out = [];
 		for($i=0;$i<sizeof($in);$i++){
 			$this->_smaz_prazdne_termy($in[$i]["childs"]);
 			if($in[$i]["type"]=="parenthesis" && sizeof($in[$i]["childs"])==0){
@@ -221,7 +221,7 @@ class FullTextSearchQuery {
 		if(!$this->_rozdel_fraze_a_zovorky($query,$out,$offset)){
 			return false;
 		}
-		$_out = array();
+		$_out = [];
 		for($i=0;$i<sizeof($out);$i++){
 			//typ zavorky -> rekursivni volani stejne fce
 			if($out[$i]["type"]=="parenthesis"){
@@ -236,7 +236,7 @@ class FullTextSearchQuery {
 			//typ term -> "ucesat vystup"
 			//pokud bude "term" po zpracovani prazdny, nic se do pole $_out neprida
 			if($out[$i]["type"]=="term"){
-				$_temp_ar = array();
+				$_temp_ar = [];
 				$_temp_ar = $this->_zpracuj_term($out[$i]);
 				for($ii=0;$ii<sizeof($_temp_ar);$ii++){
 					$_out[] = $_temp_ar[$ii];
@@ -246,7 +246,7 @@ class FullTextSearchQuery {
 			//typ phrase -> "ucesat vystup"
 			//pokud bude "term" po zpracovani prazdny, nic se do pole $_out neprida
 			if($out[$i]["type"]=="phrase"){
-				$_temp_ar = array();
+				$_temp_ar = [];
 				$_temp_ar = $this->_zpracuj_frazi($out[$i]);
 				for($ii=0;$ii<sizeof($_temp_ar);$ii++){
 					$_out[] = $_temp_ar[$ii];
@@ -290,13 +290,13 @@ class FullTextSearchQuery {
 			//zacatek zavorky
 			if($char=="(" && !$_char_is_escaped && !$_within_parentheses && !$_within_phrase){
 
-				$out[] = array(
+				$out[] = [
 					"term" => $_item,
 					"type" => "term",
 					"char_position" => (($i + $offset) - strlen($_item)), //akt znak se nepocita
 					"occurrence" => $_occurrence,
-					"childs" => array()
-				);
+					"childs" => []
+				];
 				$_within_parentheses = true;
 				$_parentheses_counter++;
 				$_item = "";
@@ -321,13 +321,13 @@ class FullTextSearchQuery {
 				$_parentheses_counter--;
 				if($_parentheses_counter==0){
 					$_within_parentheses = false;
-					$out[] = array(
+					$out[] = [
 						"term" => $_item,
 						"type" => "parenthesis",
 						"char_position" => (($i + $offset) - strlen($_item)),
 						"occurrence" => $_occurrence,
-						"childs" => array()
-					);
+						"childs" => []
+					];
 					$_item = "";
 					$_occurrence = "MUST";
 					continue;
@@ -336,13 +336,13 @@ class FullTextSearchQuery {
 
 			//zacatek fraze
 			if($char=="\"" && !$_char_is_escaped && !$_within_parentheses && !$_within_phrase){
-				$out[] = array(
+				$out[] = [
 					"term" => $_item,
 					"type" => "term",
 					"char_position" => (($i + $offset) - strlen($_item)), //akt znak se nepocita
 					"occurrence" => $_occurrence,
-					"childs" => array()
-				);
+					"childs" => []
+				];
 				$_within_phrase = true;
 				$_item = "";
 
@@ -352,13 +352,13 @@ class FullTextSearchQuery {
 
 			//konec fraze
 			if($char=="\"" && !$_char_is_escaped && $_within_phrase){
-				$out[] = array(
+				$out[] = [
 					"term" => $_item,
 					"type" => "phrase",
 					"char_position" => (($i + $offset) - strlen($_item)), //akt znak (") se nepocia
 					"occurrence" => $_occurrence,
-					"childs" => array()
-				);
+					"childs" => []
+				];
 				$_within_phrase = false;
 				$_item = "";
 				$_occurrence = "MUST";
@@ -399,13 +399,13 @@ class FullTextSearchQuery {
 		}
 
 		//posledni term pridame nakonec (i kdyby byl zcela prazdny)
-		$out[] = array(
+		$out[] = [
 				"term" => $_item,
 				"type" => "term",
 				"char_position" => ((strlen($query)) - strlen($_item)) + $offset,
 				"occurrence" => $_occurrence,
-				"childs" => array()
-		);
+				"childs" => []
+		];
 		return true;
 	}
 
@@ -437,7 +437,7 @@ class FullTextSearchQuery {
 
 	function _zpracuj_term($in){
 		settype($in,"array");
-		$out = array();
+		$out = [];
 		$query = $in["term"];
 		$offset = $in["char_position"];
 
@@ -478,13 +478,13 @@ class FullTextSearchQuery {
 							if(sizeof($out) == 0){ $_first_occurrence_set = true;}
 						}
 						if(sizeof($out) == 1){ $_second_occurrence = $_occurrence;}
-						$out[] = array(
+						$out[] = [
 							"term" => $_item,
 							"type" => "term",
 							"char_position" => ($i + $offset) - strlen($_item),
 							"occurrence" => $_occurrence,
-							"childs" => array()
-						);
+							"childs" => []
+						];
 						//nastavit $_occurrence na defaultni hodnotu
 						$_occurrence = "MUST";
 					}
@@ -517,13 +517,13 @@ class FullTextSearchQuery {
 					$_item = substr($_item,1);
 				}
 				if(sizeof($out) == 1){ $_second_occurrence = $_occurrence;}
-				$out[] = array(
+				$out[] = [
 					"term" => $_item,
 					"type" => "term",
 					"char_position" => ($i + $offset) - strlen($_item),
 					"occurrence" => $_occurrence,
-					"childs" => array()
-				);
+					"childs" => []
+				];
 			}
 		}
 
@@ -532,8 +532,8 @@ class FullTextSearchQuery {
 		}
 
 		//setrideni termu podle occurrence
-		$_out = array();
-		$_ar = array("MUST","SHOULD","NOT");
+		$_out = [];
+		$_ar = ["MUST","SHOULD","NOT"];
 		foreach($_ar as $_occurrence){
 			for($i=0;$i<sizeof($out);$i++){
 				if($out[$i]["occurrence"]==$_occurrence){
@@ -587,10 +587,10 @@ class FullTextSearchQuery {
 		}
 
 		if(strlen($output)==0){
-			return array();
+			return [];
 		}
 		$in["term"] = $output;
-		return array($in);
+		return [$in];
 	}
 
 	function _is_white_char($char){
@@ -598,7 +598,7 @@ class FullTextSearchQuery {
 		if(strlen($char)!=1){
 			return false;
 		}
-		if(in_array($char,array(" ","\n","\r","\t"))){
+		if(in_array($char,[" ","\n","\r","\t"])){
 			return true;
 		}
 		return false;

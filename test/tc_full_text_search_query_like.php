@@ -18,9 +18,9 @@ class TcFullTextSearchQueryLike extends TcBase {
 	}
 
 	function test_set_field_name(){
-		$ftsql = new FullTextSearchQueryLike(array("title","description"));
+		$ftsql = new FullTextSearchQueryLike(["title","description"]);
 
-		$prev_f = $ftsql->set_field_name(array("title"));
+		$prev_f = $ftsql->set_field_name(["title"]);
 		$this->assertEquals("title||' '||description",$prev_f);
 
 		$prev_f = $ftsql->set_field_name("name");
@@ -46,7 +46,7 @@ class TcFullTextSearchQueryLike extends TcBase {
 		$search_condition = "WHERE ".$ftsql->get_formatted_query_with_binds($bindings); // e.g. "WHERE title LIKE '%beer%' AND title LIKE '%wine%'"
 
 		$this->assertEquals("WHERE title LIKE :search_word_021 AND title LIKE :search_word_022",$search_condition);
-		$this->assertEquals(array(":search_word_021" => "%beer%", ":search_word_022" => "%wine%"),$bindings);
+		$this->assertEquals([":search_word_021" => "%beer%", ":search_word_022" => "%wine%"],$bindings);
 	}
 
 	// zavorky drive zmizely uz pri tokenizaci, protoze _removeDangerousSymbols()
@@ -77,11 +77,11 @@ class TcFullTextSearchQueryLike extends TcBase {
 	function test_bindings_with_parentheses(){
 		$ftsql = new FullTextSearchQueryLike("title");
 		$ftsql->parse("beer and (wine or juice)");
-		$bindings = array();
+		$bindings = [];
 		$search_condition = $ftsql->get_formatted_query_with_binds($bindings);
 
 		$this->assertEquals(3,sizeof($bindings));
-		$this->assertEquals(array("%beer%","%wine%","%juice%"),array_values($bindings));
+		$this->assertEquals(["%beer%","%wine%","%juice%"],array_values($bindings));
 
 		$keys = array_keys($bindings);
 		$this->assertEquals(
@@ -113,7 +113,7 @@ class TcFullTextSearchQueryLike extends TcBase {
 		$ftsql = new FullTextSearchQueryLike("title");
 		$ftsql->set_search_whole_words_only();
 		$ftsql->parse("cat");
-		$bindings = array();
+		$bindings = [];
 		$condition = $ftsql->get_formatted_query_with_binds($bindings);
 
 		$this->assertEquals(49,sizeof($bindings));
@@ -151,7 +151,7 @@ class TcFullTextSearchQueryLike extends TcBase {
 		$ftsql = new FullTextSearchQueryLike("title");
 		$ftsql->set_search_word_beginnings_only();
 		$ftsql->parse("cat");
-		$bindings = array();
+		$bindings = [];
 		$condition = $ftsql->get_formatted_query_with_binds($bindings);
 
 		$this->assertEquals(7,sizeof($bindings));
@@ -168,29 +168,29 @@ class TcFullTextSearchQueryLike extends TcBase {
 	// s fatalni chybou.
 	function test_get_query_with_options(){
 		$bind_ar = null;
-		$condition = FullTextSearchQueryLike::GetQuery("title","cat",$bind_ar,array(
+		$condition = FullTextSearchQueryLike::GetQuery("title","cat",$bind_ar,[
 			"search_word_beginnings_only" => true,
-		));
+		]);
 		$this->assertEquals(true,$this->_like_condition_matches($condition,"A green caterpillar"));
 
 		$bind_ar = null;
-		$condition = FullTextSearchQueryLike::GetQuery("title","cat",$bind_ar,array(
+		$condition = FullTextSearchQueryLike::GetQuery("title","cat",$bind_ar,[
 			"search_whole_words_only" => true,
-		));
+		]);
 		$this->assertEquals(false,$this->_like_condition_matches($condition,"concatenate"));
 		$this->assertEquals(true,$this->_like_condition_matches($condition,"the cat sat"));
 
 		$this->assertEquals(
 			"title LIKE '%beer'",
-			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,array("like_match" => "left"))
+			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,["like_match" => "left"])
 		);
 		$this->assertEquals(
 			"title LIKE 'beer%'",
-			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,array("like_match" => "right"))
+			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,["like_match" => "right"])
 		);
 		$this->assertEquals(
 			"title LIKE 'beer'",
-			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,array("like_match" => "none"))
+			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,["like_match" => "none"])
 		);
 
 		// neplatna hodnota like_match musi bezpecne spadnout na vychozi "both",
@@ -198,7 +198,7 @@ class TcFullTextSearchQueryLike extends TcBase {
 		// prirazeni do $_like_match bez prochazeni pres set_like_match_*())
 		$this->assertEquals(
 			"title LIKE '%beer%'",
-			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,array("like_match" => "garbage"))
+			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,["like_match" => "garbage"])
 		);
 
 		// bez $options se GetQuery() chova stejne jako drive
