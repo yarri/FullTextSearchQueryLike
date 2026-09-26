@@ -161,6 +161,53 @@ class TcFullTextSearchQueryLike extends TcBase {
 		$this->assertEquals(true,$this->_like_condition_matches(array_values($bindings),"A green caterpillar"));
 	}
 
+	// GetQuery() ma 4. parametr $options, kterym lze nastavit like_match a oba
+	// rezimy hledani celych slov / zacatku slov bez vytvareni instance rucne.
+	// search_word_beginnings_only drive volalo set_search_word_beginnings_only()
+	// na preklepem zavedene nedefinovane promenne ($fr misto $ft) a spadlo to
+	// s fatalni chybou.
+	function test_get_query_with_options(){
+		$bind_ar = null;
+		$condition = FullTextSearchQueryLike::GetQuery("title","cat",$bind_ar,array(
+			"search_word_beginnings_only" => true,
+		));
+		$this->assertEquals(true,$this->_like_condition_matches($condition,"A green caterpillar"));
+
+		$bind_ar = null;
+		$condition = FullTextSearchQueryLike::GetQuery("title","cat",$bind_ar,array(
+			"search_whole_words_only" => true,
+		));
+		$this->assertEquals(false,$this->_like_condition_matches($condition,"concatenate"));
+		$this->assertEquals(true,$this->_like_condition_matches($condition,"the cat sat"));
+
+		$this->assertEquals(
+			"title LIKE '%beer'",
+			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,array("like_match" => "left"))
+		);
+		$this->assertEquals(
+			"title LIKE 'beer%'",
+			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,array("like_match" => "right"))
+		);
+		$this->assertEquals(
+			"title LIKE 'beer'",
+			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,array("like_match" => "none"))
+		);
+
+		// neplatna hodnota like_match musi bezpecne spadnout na vychozi "both",
+		// ne se ticho projevit jako "none" (jako by to delalo pri primem
+		// prirazeni do $_like_match bez prochazeni pres set_like_match_*())
+		$this->assertEquals(
+			"title LIKE '%beer%'",
+			FullTextSearchQueryLike::GetQuery("title","beer",$bind_ar,array("like_match" => "garbage"))
+		);
+
+		// bez $options se GetQuery() chova stejne jako drive
+		$this->assertEquals(
+			"title LIKE '%beer%' AND title LIKE '%wine%'",
+			FullTextSearchQueryLike::GetQuery("title","beer and wine")
+		);
+	}
+
 	// jednoducha emulace SQL LIKE (jen "%" jako divoka karta) nad vzory
 	// "title LIKE '...'" vygenerovanymi knihovnou pro jedno pole a jeden term,
 	// nebo primo nad polem bind hodnot - vyhodnoti se jako OR vsech vzoru

@@ -50,8 +50,29 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 		$this->set_field_name($field_name);
 	}
 
-	static function GetQuery($field,$query,&$bind_ar = null){
+	static function GetQuery($field,$query,&$bind_ar = null,$options = []){
+		$options += [
+			"like_match" => "both", //"left","right","both", "none"
+			"search_whole_words_only" => false,
+			"search_word_beginnings_only" => false,
+		];
 		$ft = new FullTextSearchQueryLike($field);
+		switch((string)$options["like_match"]){
+			case "left":
+				$ft->set_like_match_left();
+				break;
+			case "right":
+				$ft->set_like_match_right();
+				break;
+			case "none":
+				$ft->set_like_match_none();
+				break;
+			default:
+				$ft->set_like_match_both();
+				break;
+		}
+		if($options["search_whole_words_only"]){ $ft->set_search_whole_words_only(); }
+		if($options["search_word_beginnings_only"]){ $ft->set_search_word_beginnings_only(); }
 		if($ft->parse($query)){
 			if(isset($bind_ar)){
 				return $ft->get_formatted_query_with_binds($bind_ar);
