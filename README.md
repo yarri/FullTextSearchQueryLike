@@ -6,7 +6,7 @@ FullTextSearchQueryLike
 
 A PHP class which transforms search strings into clever SQL conditions with the LIKE operator.
 
-The FullTextSearchQueryLike is fully tested in PHP from version 5.6 to 8.1.
+The FullTextSearchQueryLike is fully tested in PHP from version 5.6 to 8.5.
 
 Basic usage
 -----------
@@ -44,6 +44,43 @@ Some other specialities...
 | ' OR ''='                  |                                                                                                   |
 | '; DROP TABLE articles; -- | title LIKE '%DROP%' AND title LIKE '%TABLE%' AND title LIKE '%articles%' AND NOT title LIKE '%-%' |
 
+
+Grouping with parentheses and exact phrases
+--------------------------------------------
+
+    $ftsql = new FullTextSearchQueryLike("title");
+    if($ftsql->parse('beer and (wine or juice)')){
+      echo $ftsql->get_formatted_query();
+      // title LIKE '%beer%' AND (title LIKE '%wine%' OR title LIKE '%juice%')
+    }
+
+    $ftsql = new FullTextSearchQueryLike("title");
+    if($ftsql->parse('"dark beer" burger')){
+      echo $ftsql->get_formatted_query();
+      // title LIKE '%dark beer%' AND title LIKE '%burger%'
+    }
+
+Whole words and word beginnings
+--------------------------------
+
+By default a search word matches anywhere inside the field (a plain substring LIKE).
+Two other modes are available, and are mutually exclusive - enabling one disables the other.
+
+    $ftsql = new FullTextSearchQueryLike("title");
+    $ftsql->set_search_whole_words_only();
+    if($ftsql->parse("cat")){
+      // matches "the cat sat", does NOT match "concatenate"
+    }
+
+    $ftsql = new FullTextSearchQueryLike("title");
+    $ftsql->set_search_word_beginnings_only();
+    if($ftsql->parse("cat")){
+      // matches "A green caterpillar" (word starting with "cat"), does NOT match "concatenate"
+    }
+
+Both modes are best-effort approximations built on plain LIKE (SQL has no real word-boundary
+matching), so unusual punctuation around a word may not always behave perfectly. Both also
+ignore `set_like_match_left/right/both/none()`, since they build their own LIKE patterns.
 
 Searching in more fields
 ------------------------
