@@ -31,6 +31,14 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 	protected $_search_whole_words_only = false;
 
 	/**
+	 * Zacatky slov.
+	 * Pokud bude nastaveno na true, bude se hledany term muset shodovat
+	 * se zacatkem nejakeho slova v poli (nemusi jit o cele slovo).
+	 * Napr. term "cat" najde "A green caterpillar", ale term "pill" uz ne.
+	 */
+	protected $_search_word_beginnings_only = false;
+
+	/**
 	 *
 	 *	$ft = new FullTextSearchQuery();
 	 *	$ft = new FullTextSearchQuery("title");
@@ -81,6 +89,12 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 
 	function set_search_whole_words_only(){
 		$this->_search_whole_words_only = true;
+		$this->_search_word_beginnings_only = false;
+	}
+
+	function set_search_word_beginnings_only(){
+		$this->_search_word_beginnings_only = true;
+		$this->_search_whole_words_only = false;
 	}
 
 	function valid_term(&$slovo,$cislo_znaku,&$error_message){
@@ -199,7 +213,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 		if($this->_like_match=="right" || $this->_like_match=="both"){
 			$_right = "%";
 		}
-		if($this->_search_whole_words_only){
+		if($this->_search_whole_words_only || $this->_search_word_beginnings_only){
 			$_left = "";
 			$_right = "";
 		}
@@ -223,29 +237,41 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 				}
 			}
 
-			if(!$this->_search_whole_words_only && ($item["type"]=="term" || $item["type"]=="phrase")){
-				$key = $this->_add_bind("$_left$item[term]$_right",$bind_ar);
-				$out .= "$this->_field_name LIKE $key";
-			}
-			/* Vyhledavani celych slov jenom pomoci LIKE je docela nemozne. Nasledujici reseni to jaksi resi. */
-			/* Muze se stat, ze bude nalezeno neco, co nalezeneno byt nemelo */
-			if($this->_search_whole_words_only && ($item["type"]=="term" || $item["type"]=="phrase")){
-				/* Hranice PRED a ZA slovem musi platit soucasne pro TENTYZ vyskyt v retezci -
-				 * proto se testuji vsechny kombinace v jednom LIKE vzoru najednou, ne dve na
-				 * sobe nezavisle OR'ovane skupiny spojene pres AND (to by dovolilo, aby "pred"
-				 * vyhovel jinemu vyskytu podretezce v poli nez "za", a vyrobilo tak false-positive
-				 * napr. pro "cat" v "educat, catering"). */
-				$_before_boundaries = array("", " ", ".", ",", "/", "(", "-");
-				$_after_boundaries = array("", " ", ".", ",", "/", ")", "-");
-				$_patterns = array();
-				foreach($_before_boundaries as $_before){
-					foreach($_after_boundaries as $_after){
-						$_pattern = ($_before==="" ? "" : "%$_before").$item["term"].($_after==="" ? "" : "$_after%");
+			if($item["type"]=="term" || $item["type"]=="phrase"){
+				if($this->_search_whole_words_only){
+					/* Vyhledavani celych slov jenom pomoci LIKE je docela nemozne. Nasledujici reseni to jaksi resi. */
+					/* Muze se stat, ze bude nalezeno neco, co nalezeneno byt nemelo */
+					/* Hranice PRED a ZA slovem musi platit soucasne pro TENTYZ vyskyt v retezci -
+					 * proto se testuji vsechny kombinace v jednom LIKE vzoru najednou, ne dve na
+					 * sobe nezavisle OR'ovane skupiny spojene pres AND (to by dovolilo, aby "pred"
+					 * vyhovel jinemu vyskytu podretezce v poli nez "za", a vyrobilo tak false-positive
+					 * napr. pro "cat" v "educat, catering"). */
+					$_before_boundaries = array("", " ", ".", ",", "/", "(", "-");
+					$_after_boundaries = array("", " ", ".", ",", "/", ")", "-");
+					$_patterns = array();
+					foreach($_before_boundaries as $_before){
+						foreach($_after_boundaries as $_after){
+							$_pattern = ($_before==="" ? "" : "%$_before").$item["term"].($_after==="" ? "" : "$_after%");
+							$_key = $this->_add_bind($_pattern,$bind_ar);
+							$_patterns[] = "$this->_field_name LIKE $_key";
+						}
+					}
+					$out .= "(".join(" OR ",$_patterns).")";
+				}elseif($this->_search_word_beginnings_only){
+					/* Term nemusi byt cele slovo, staci aby zacinal nejakym slovem v poli -
+					 * proto se overuje jen hranice PRED termem, za nim uz muze nasledovat cokoli. */
+					$_before_boundaries = array("", " ", ".", ",", "/", "(", "-");
+					$_patterns = array();
+					foreach($_before_boundaries as $_before){
+						$_pattern = ($_before==="" ? "" : "%$_before").$item["term"]."%";
 						$_key = $this->_add_bind($_pattern,$bind_ar);
 						$_patterns[] = "$this->_field_name LIKE $_key";
 					}
+					$out .= "(".join(" OR ",$_patterns).")";
+				}else{
+					$key = $this->_add_bind("$_left$item[term]$_right",$bind_ar);
+					$out .= "$this->_field_name LIKE $key";
 				}
-				$out .= "(".join(" OR ",$_patterns).")";
 			}
 
 			if($item["type"] == "parenthesis"){

@@ -112,6 +112,43 @@ class TcFullTextSearchQueryLike extends TcBase {
 		$this->assertEquals(true,$this->_like_condition_matches(array_values($bindings),"the cat sat"));
 	}
 
+	// set_search_word_beginnings_only() - term nemusi byt cele slovo, staci
+	// aby se shodoval se zacatkem nejakeho slova v poli
+	function test_search_word_beginnings_only(){
+		$ftsql = new FullTextSearchQueryLike("title");
+		$ftsql->set_search_word_beginnings_only();
+		$this->assertEquals(true,$ftsql->parse("cat"));
+		$condition = $ftsql->get_formatted_query();
+
+		$this->assertEquals(true,$this->_like_condition_matches($condition,"A green caterpillar"));
+		$this->assertEquals(true,$this->_like_condition_matches($condition,"cat"));
+		$this->assertEquals(true,$this->_like_condition_matches($condition,"a cat"));
+
+		$ftsql2 = new FullTextSearchQueryLike("title");
+		$ftsql2->set_search_word_beginnings_only();
+		$this->assertEquals(true,$ftsql2->parse("pill"));
+		$condition2 = $ftsql2->get_formatted_query();
+
+		// "pill" je jen uprostred slova "caterpillar", ne na jeho zacatku
+		$this->assertEquals(false,$this->_like_condition_matches($condition2,"A green caterpillar"));
+	}
+
+	// binding musi fungovat i v tomto rezimu (viz oprava chybejiciho _add_bind
+	// v rezimu set_search_whole_words_only())
+	function test_search_word_beginnings_only_with_binds(){
+		$ftsql = new FullTextSearchQueryLike("title");
+		$ftsql->set_search_word_beginnings_only();
+		$ftsql->parse("cat");
+		$bindings = array();
+		$condition = $ftsql->get_formatted_query_with_binds($bindings);
+
+		$this->assertEquals(7,sizeof($bindings));
+		$this->assertEquals(true,in_array("cat%",array_values($bindings)));
+		$this->assertEquals(0,substr_count($condition,"'"));
+
+		$this->assertEquals(true,$this->_like_condition_matches(array_values($bindings),"A green caterpillar"));
+	}
+
 	// jednoducha emulace SQL LIKE (jen "%" jako divoka karta) nad vzory
 	// "title LIKE '...'" vygenerovanymi knihovnou pro jedno pole a jeden term,
 	// nebo primo nad polem bind hodnot - vyhodnoti se jako OR vsech vzoru
