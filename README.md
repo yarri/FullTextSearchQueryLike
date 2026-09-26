@@ -125,6 +125,38 @@ This is quite useful e.g. for Oracle database.
     $query = "SELECT * FROM articles $search_condition ORDER BY created_at DESC";
     var_dump($bindings); // e.g. [":search_word_021" => "%beer%", ":search_word_022" => "%wine%"]
 
+Shortcut: GetQuery()
+--------------------
+
+The most common usage - parse the query, get the condition, skip it if the query was empty or
+invalid - can be written in a single call using the static `GetQuery()` shortcut instead of
+manually creating an instance:
+
+    $q = $_GET["search"];
+
+    if($ft_cond = FullTextSearchQueryLike::GetQuery("title",$q)){
+      $conditions[] = $ft_cond;
+    }
+
+`GetQuery($field, $query, &$bind_ar = null, $options = [])` returns the formatted condition, or
+`null` if the query was empty/invalid. Pass a pre-initialized variable as `$bind_ar` to get
+placeholders back instead of literal values (same as `get_formatted_query_with_binds()` above) -
+leave it out (or `null`) to get literal values:
+
+    $bind_ar = [];
+    $ft_cond = FullTextSearchQueryLike::GetQuery("title",$q,$bind_ar);
+    // $ft_cond e.g. "title LIKE :search_word_007 AND title LIKE :search_word_008"
+    // $bind_ar e.g. [":search_word_007" => "%beer%", ":search_word_008" => "%wine%"]
+
+`$options` lets you configure the same things as `set_like_match_*()` and the whole-word/
+word-beginning modes above, without creating the instance yourself:
+
+    $ft_cond = FullTextSearchQueryLike::GetQuery("title",$q,$bind_ar,array(
+      "like_match" => "both", // "left","right","both","none" - defaults to "both"
+      "search_whole_words_only" => false,
+      "search_word_beginnings_only" => false,
+    ));
+
 Keywords highlighter
 --------------------
 
