@@ -266,7 +266,6 @@ class FullTextSearchQuery {
 		$_within_phrase = false;
 		$_item = "";
 
-		$prev_char = "";
 		$_last_word_harvest = "";
 		$_last_word = "";
 		$_occurrence = "MUST";
@@ -275,13 +274,19 @@ class FullTextSearchQuery {
 		for($i=0;$i<strlen($query);$i++){
 			//aktualni znak
 			$char = $query[$i];
-			//predchozi znak
-			if($i>=1){
-				$prev_char = $query[$i-1];
+
+			//pocet po sobe jdoucich zpetnych lomitek bezprostredne pred aktualnim
+			//znakem - licha hodnota znamena, ze aktualni znak je escapovany.
+			//Staci se divat jen na predchozi znak, u "\\(" (escapovane lomitko a za
+			//nim realna zavorka) by to zavorku chybne oznacilo za escapovanou.
+			$_preceding_backslashes = 0;
+			for($_j=$i-1; $_j>=0 && $query[$_j]=="\\"; $_j--){
+				$_preceding_backslashes++;
 			}
+			$_char_is_escaped = ($_preceding_backslashes % 2)==1;
 
 			//zacatek zavorky
-			if($char=="(" && $prev_char!="\\" && !$_within_parentheses && !$_within_phrase){
+			if($char=="(" && !$_char_is_escaped && !$_within_parentheses && !$_within_phrase){
 
 				$out[] = array(
 					"term" => $_item,
@@ -316,12 +321,12 @@ class FullTextSearchQuery {
 			}
 
 			//zvyseni pocitace zavorek uvnitr zavorek
-			if($char=="(" && $prev_char!="\\" && $_within_parentheses){
+			if($char=="(" && !$_char_is_escaped && $_within_parentheses){
 				$_parentheses_counter++;
 			}
 
 			//konec zavorky (pokud vyjde $_parentheses_counter==0)
-			if($char==")" && $prev_char!="\\" && !$_within_phrase){
+			if($char==")" && !$_char_is_escaped && !$_within_phrase){
 				//pokud nejsme v zavorkach
 				if(!$_within_parentheses){
 					$this->_error_number = 1;
@@ -345,7 +350,7 @@ class FullTextSearchQuery {
 			}
 
 			//zacatek fraze
-			if($char=="\"" && $prev_char!="\\" && !$_within_parentheses && !$_within_phrase){
+			if($char=="\"" && !$_char_is_escaped && !$_within_parentheses && !$_within_phrase){
 				$out[] = array(
 					"term" => $_item,
 					"type" => "term",
@@ -379,7 +384,7 @@ class FullTextSearchQuery {
 			}
 
 			//konec fraze
-			if($char=="\"" && $prev_char!="\\" && $_within_phrase){
+			if($char=="\"" && !$_char_is_escaped && $_within_phrase){
 				$out[] = array(
 					"term" => $_item,
 					"type" => "phrase",

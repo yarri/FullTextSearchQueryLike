@@ -82,6 +82,70 @@ class TcFullTextSearchQuery extends TcBase {
 		$this->assertFalse($ftsq->parse(null));
 	}
 
+	// drive se escapovani zavorek/uvozovek posuzovalo jen podle jednoho
+	// predchoziho znaku, takze "\\(" (escapovane lomitko a za nim realna
+	// zavorka) bylo chybne vyhodnoceno jako escapovana zavorka
+	function test_escaped_backslash_before_parenthesis(){
+		// jedno escapovane lomitko -> zavorka zustava literal, zadna skupina
+		$this->_testValidParse("a \\( b",array(
+			array(
+				"term" => "a",
+				"type" => "term",
+				"char_position" => 0,
+				"occurrence" => "MUST",
+				"childs" => array(),
+			),
+			array(
+				"term" => "(",
+				"type" => "term",
+				"char_position" => 3,
+				"occurrence" => "MUST",
+				"childs" => array(),
+			),
+			array(
+				"term" => "b",
+				"type" => "term",
+				"char_position" => 5,
+				"occurrence" => "MUST",
+				"childs" => array(),
+			),
+		));
+
+		// dve zpetna lomitka -> prvni escapuje druhe (vznikne jeden literalni
+		// backslash), zavorka uz escapovana neni a otevira skutecnou skupinu
+		$this->_testValidParse("a \\\\( b)",array(
+			array(
+				"term" => "a",
+				"type" => "term",
+				"char_position" => 0,
+				"occurrence" => "MUST",
+				"childs" => array(),
+			),
+			array(
+				"term" => "\\",
+				"type" => "term",
+				"char_position" => 3,
+				"occurrence" => "MUST",
+				"childs" => array(),
+			),
+			array(
+				"term" => " b",
+				"type" => "parenthesis",
+				"char_position" => 5,
+				"occurrence" => "MUST",
+				"childs" => array(
+					array(
+						"term" => "b",
+						"type" => "term",
+						"char_position" => 6,
+						"occurrence" => "MUST",
+						"childs" => array(),
+					),
+				),
+			),
+		));
+	}
+
 	function _testValidParse($query,$expected_tree){
 		$ftsq = new FullTextSearchQuery();
 
