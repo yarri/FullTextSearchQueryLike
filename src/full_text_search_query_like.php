@@ -16,19 +16,19 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 	/**
 	 * Jmeno pole, ve kterem se ma vyhledavat.
 	 */
-	var $_field_name = "";
+	protected $_field_name = "";
 
 	/**
 	 * Z jake strany vyhledavaneho terminu se ma pripojit like.
 	 * Paklize, je nastaveno $_search_whole_words_only na true, ignoruje se.
 	 */
-	var	$_like_match = "both"; //"left","right","both", "none"
+	protected $_like_match = "both"; //"left","right","both", "none"
 
 	/**
 	 * Cela slova.
 	 * Pokud bude nastaveno na true, budou se hledat jen cela slova.
 	 */
-	var	$_search_whole_words_only = false;
+	protected $_search_whole_words_only = false;
 
 	/**
 	 *

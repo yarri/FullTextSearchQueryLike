@@ -1,10 +1,10 @@
 <?php
 class FullTextSearchQuery {
 
-	var $AUTO_AVOID_ERROR = true;
-	var $_error_number = 0;
-	var $_error_char_position = null;
-	var $_error_messages = array(
+	protected $AUTO_AVOID_ERROR = true;
+	protected $_error_number = 0;
+	protected $_error_char_position = null;
+	protected $_error_messages = array(
 				//byla nalezena prava zavorka, ale chybi ji leva
 				"1" => "not opened parenthesis at char %char_position%",
 				//zavorka nebyla uzavrena
@@ -12,8 +12,8 @@ class FullTextSearchQuery {
 				//fraze nebyla uzvarena
 				"3" => "not closed phrase at char %char_position%"
 			);
-	var $_custom_error_message = "";
-	var $_TREE = array();
+	protected $_custom_error_message = "";
+	protected $_TREE = array();
 
 	function __construct(){
 
