@@ -45,17 +45,7 @@ class FullTextSearchQuery {
 		$out = array();
 		$_stat = $this->_zpracuj($query,$out);
 		if(!$_stat){
-			if($this->AUTO_AVOID_ERROR && (is_int(strpos($query,"(")) || is_int(strpos($query,")")) || is_int(strpos($query,'"')))){
-				$query = strtr($query,
-					array(
-						"(" => " ",
-						")" => " ",
-						'"' => " "
-					)
-				);
-				return $this->parse($query);
-			}
-			return false;
+			return $this->_zkusit_parse_bez_zavorek_a_uvozovek($query);
 		}
 
 		//smazani prazednych termu
@@ -66,17 +56,7 @@ class FullTextSearchQuery {
 		//volaji se metody valid_term a valid_phrase (tyto metody je fajn redefinovat v dedicne tride, jinak se vse zvaliduje jako spravne)
 		$_stat = $this->_validuj_TREE($out);
 		if(!$_stat){
-			if($this->AUTO_AVOID_ERROR && (is_int(strpos($query,"(")) || is_int(strpos($query,")")) || is_int(strpos($query,'"')))){
-				$query = strtr($query,
-					array(
-						"(" => " ",
-						")" => " ",
-						'"' => " "
-					)
-				);
-				return $this->parse($query);
-			}
-			return false;
+			return $this->_zkusit_parse_bez_zavorek_a_uvozovek($query);
 		}
 
 		//smazani prazednych termu (asi pro jistotu)
@@ -85,6 +65,28 @@ class FullTextSearchQuery {
 		//hotovy strom je zde
 		$this->_TREE =$out;
 		return true;
+	}
+
+	/**
+	 * Pokud je zapnute AUTO_AVOID_ERROR a $query obsahuje zavorku nebo
+	 * uvozovku, zkusi se dotaz naparsovat znovu s temito znaky smazanymi.
+	 * Jinak vraci false (parsovani se povazuje za neuspesne).
+	 */
+	protected function _zkusit_parse_bez_zavorek_a_uvozovek($query){
+		if(!$this->AUTO_AVOID_ERROR){
+			return false;
+		}
+		if(!is_int(strpos($query,"(")) && !is_int(strpos($query,")")) && !is_int(strpos($query,'"'))){
+			return false;
+		}
+		$query = strtr($query,
+			array(
+				"(" => " ",
+				")" => " ",
+				'"' => " "
+			)
+		);
+		return $this->parse($query);
 	}
 
 	protected function _removeDangerousSymbols($query){
