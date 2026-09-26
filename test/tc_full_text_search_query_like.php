@@ -80,7 +80,7 @@ class TcFullTextSearchQueryLike extends TcBase {
 		$bindings = [];
 		$search_condition = $ftsql->get_formatted_query_with_binds($bindings);
 
-		$this->assertEquals(3,sizeof($bindings));
+		$this->assertEquals(3,count($bindings));
 		$this->assertEquals(["%beer%","%wine%","%juice%"],array_values($bindings));
 
 		$keys = array_keys($bindings);
@@ -116,7 +116,7 @@ class TcFullTextSearchQueryLike extends TcBase {
 		$bindings = [];
 		$condition = $ftsql->get_formatted_query_with_binds($bindings);
 
-		$this->assertEquals(49,sizeof($bindings));
+		$this->assertEquals(49,count($bindings));
 		$this->assertEquals(true,in_array("cat",array_values($bindings)));
 		$this->assertEquals(0,substr_count($condition,"'")); // v $condition uz nejsou zadne SQL literaly, jen bind placeholdery
 
@@ -154,7 +154,7 @@ class TcFullTextSearchQueryLike extends TcBase {
 		$bindings = [];
 		$condition = $ftsql->get_formatted_query_with_binds($bindings);
 
-		$this->assertEquals(7,sizeof($bindings));
+		$this->assertEquals(7,count($bindings));
 		$this->assertEquals(true,in_array("cat%",array_values($bindings)));
 		$this->assertEquals(0,substr_count($condition,"'"));
 

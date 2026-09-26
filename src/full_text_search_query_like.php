@@ -126,7 +126,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 	function valid_phrase(&$fraze,$cislo_znaku,&$error_message){
 		$out_ar = [];
 		$_ar = explode(" ",$fraze);
-		for($i=0;$i<sizeof($_ar);$i++){
+		for($i=0;$i<count($_ar);$i++){
 			$slovo = $_ar[$i];
 			if($slovo==""){
 				continue;
@@ -233,7 +233,7 @@ class FullTextSearchQueryLike extends FullTextSearchQuery{
 			$_right = "";
 		}
 		$out = "";
-		for($i=0;$i<sizeof($tree);$i++){
+		for($i=0;$i<count($tree);$i++){
 			$item = $tree[$i];
 
 			//occurrence

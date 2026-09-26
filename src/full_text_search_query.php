@@ -50,7 +50,7 @@ class FullTextSearchQuery {
 
 		//smazani prazednych termu
 		$this->_smaz_prazdne_termy($out);
-		if(sizeof($out)==0){ return false; }
+		if(count($out)==0){ return false; }
 
 		//validace stromu
 		//volaji se metody valid_term a valid_phrase (tyto metody je fajn redefinovat v dedicne tride, jinak se vse zvaliduje jako spravne)
@@ -166,7 +166,7 @@ class FullTextSearchQuery {
 	}
 	function _validuj_TREE(&$in){
 		$_out = [];
-		for($i=0;$i<sizeof($in);$i++){
+		for($i=0;$i<count($in);$i++){
 			$this->_validuj_TREE($in[$i]["childs"]);
 			if($in[$i]["type"]=="term"){
 				$_error_message = "";
@@ -199,9 +199,9 @@ class FullTextSearchQuery {
 
 	function _smaz_prazdne_termy(&$in){
 		$_out = [];
-		for($i=0;$i<sizeof($in);$i++){
+		for($i=0;$i<count($in);$i++){
 			$this->_smaz_prazdne_termy($in[$i]["childs"]);
-			if($in[$i]["type"]=="parenthesis" && sizeof($in[$i]["childs"])==0){
+			if($in[$i]["type"]=="parenthesis" && count($in[$i]["childs"])==0){
 				continue;
 			}
 			if($in[$i]["type"]=="phrase" && strlen($in[$i]["term"])==0){
@@ -222,11 +222,11 @@ class FullTextSearchQuery {
 			return false;
 		}
 		$_out = [];
-		for($i=0;$i<sizeof($out);$i++){
+		for($i=0;$i<count($out);$i++){
 			//typ zavorky -> rekursivni volani stejne fce
 			if($out[$i]["type"]=="parenthesis"){
 				$_out[] = $out[$i];
-				$_key = sizeof($_out) - 1;
+				$_key = count($_out) - 1;
 				//rekurse
 				if(!$this->_zpracuj($_out[$_key]["term"],$_out[$_key]["childs"],$_out[$_key]["char_position"])){
 					return false;
@@ -238,7 +238,7 @@ class FullTextSearchQuery {
 			if($out[$i]["type"]=="term"){
 				$_temp_ar = [];
 				$_temp_ar = $this->_zpracuj_term($out[$i]);
-				for($ii=0;$ii<sizeof($_temp_ar);$ii++){
+				for($ii=0;$ii<count($_temp_ar);$ii++){
 					$_out[] = $_temp_ar[$ii];
 				}
 			}
@@ -248,7 +248,7 @@ class FullTextSearchQuery {
 			if($out[$i]["type"]=="phrase"){
 				$_temp_ar = [];
 				$_temp_ar = $this->_zpracuj_frazi($out[$i]);
-				for($ii=0;$ii<sizeof($_temp_ar);$ii++){
+				for($ii=0;$ii<count($_temp_ar);$ii++){
 					$_out[] = $_temp_ar[$ii];
 				}
 			}
@@ -460,24 +460,24 @@ class FullTextSearchQuery {
 				if(strlen($_item)>0){
 					if($_item=="+" || strtoupper($_item)=="AND"){
 						$_occurrence = "MUST";
-						if(sizeof($out) == 0){ $_first_occurrence_set = true;}
+						if(count($out) == 0){ $_first_occurrence_set = true;}
 					}elseif($_item=="-" || strtoupper($_item)=="NOT"){
 						$_occurrence = "NOT";
-						if(sizeof($out) == 0){ $_first_occurrence_set = true;}
+						if(count($out) == 0){ $_first_occurrence_set = true;}
 					}elseif(strtoupper($_item)=="OR"){
 						$_occurrence = "SHOULD";
-						if(sizeof($out) == 0){ $_first_occurrence_set = true;}
+						if(count($out) == 0){ $_first_occurrence_set = true;}
 					}else{
 						if($_item[0]=="+"){
 							$_occurrence = "MUST";
 							$_item = substr($_item,1);
-							if(sizeof($out) == 0){ $_first_occurrence_set = true;}
+							if(count($out) == 0){ $_first_occurrence_set = true;}
 						}elseif($_item[0]=="-"){
 							$_occurrence = "NOT";
 							$_item = substr($_item,1);
-							if(sizeof($out) == 0){ $_first_occurrence_set = true;}
+							if(count($out) == 0){ $_first_occurrence_set = true;}
 						}
-						if(sizeof($out) == 1){ $_second_occurrence = $_occurrence;}
+						if(count($out) == 1){ $_second_occurrence = $_occurrence;}
 						$out[] = [
 							"term" => $_item,
 							"type" => "term",
@@ -516,7 +516,7 @@ class FullTextSearchQuery {
 					$_occurrence = "NOT";
 					$_item = substr($_item,1);
 				}
-				if(sizeof($out) == 1){ $_second_occurrence = $_occurrence;}
+				if(count($out) == 1){ $_second_occurrence = $_occurrence;}
 				$out[] = [
 					"term" => $_item,
 					"type" => "term",
@@ -527,7 +527,7 @@ class FullTextSearchQuery {
 			}
 		}
 
-		if(sizeof($out)>=1 && $_first_occurrence_set==false && $_second_occurrence=="SHOULD"){
+		if(count($out)>=1 && $_first_occurrence_set==false && $_second_occurrence=="SHOULD"){
 			$out[0]["occurrence"] = $_second_occurrence;
 		}
 
@@ -535,7 +535,7 @@ class FullTextSearchQuery {
 		$_out = [];
 		$_ar = ["MUST","SHOULD","NOT"];
 		foreach($_ar as $_occurrence){
-			for($i=0;$i<sizeof($out);$i++){
+			for($i=0;$i<count($out);$i++){
 				if($out[$i]["occurrence"]==$_occurrence){
 					$_out[] = $out[$i];
 				}
